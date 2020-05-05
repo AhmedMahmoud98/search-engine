@@ -20,10 +20,13 @@ public class Indexer {
 
     public void constructIndex() throws InterruptedException {
         getDocumentsURLs();
-
+        
         final int numOfThreads = (int) Math.ceil(documentsURLs.size() / DOCUMENTS_PER_THREAD);
         final Map.Entry<Integer, String>[] documentsEntries =
                 (Map.Entry<Integer, String>[]) documentsURLs.entrySet().toArray(new Map.Entry[documentsURLs.size()]);
+        
+        long timeBefore = 0, timeAfter= 0, IndexingTime = 0;
+        timeBefore = System.currentTimeMillis();
         
         List<Thread> threads = new ArrayList<Thread>();
         for (int i = 0; i < numOfThreads; i++) {
@@ -36,6 +39,10 @@ public class Indexer {
         
         for (Thread thread : threads)
         	thread.join();
+        
+        timeAfter = System.currentTimeMillis();
+        IndexingTime = timeAfter- timeBefore;
+        System.out.print(String.format("Indexing done at: %d ms \n", IndexingTime));
         
         threads.clear();
         documentsURLs.clear();
