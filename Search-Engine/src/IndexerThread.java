@@ -11,7 +11,7 @@ public class IndexerThread implements Runnable {
 	
 	/* Inverted File Dictionaries */
 	private Map <String, List<Integer>> termDictionary;
-	Map<String, Map<Integer, List<Integer>>> termDocumentDictionary;
+	private Map<String, Map<Integer, List<Integer>>> termDocumentDictionary;
 	
 	/* The Documents that this Thread should Process */
 	private Map.Entry<Integer, String>[] documentsURLs;
@@ -56,7 +56,7 @@ public class IndexerThread implements Runnable {
 			{
 				/* Write The Inverted File to the DB, Remove It from Memory then Continue To Process Documents */ 
 				SortIndex();
-				AddIndexToDB();
+				StoreDictonaries();
 				
 				termDictionary.clear();
 				termDocumentDictionary.clear();
@@ -123,8 +123,10 @@ public class IndexerThread implements Runnable {
 	}
 
 	
-	private void AddIndexToDB() {	
-	/* TODO : Add these two dictionaries to DB */	
+	private void StoreDictonaries() {
+		DbManager DBManager = DbManager.getInstance();
+		DBManager.saveTermCollection(termDictionary);
+		DBManager.saveDocumentCollection(termDocumentDictionary);
 	}
 }
 	

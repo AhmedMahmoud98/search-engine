@@ -7,5 +7,6 @@
 	</classpathentry>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/jsoup-1.13.1"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/mongo-java-driver-3.12.3"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
