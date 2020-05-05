@@ -8,7 +8,7 @@ public class DbManager {
     private DB database;
     private static DbManager instance;
     public DbManager(){
-        /* Intialize default connection */
+        /* Initialize default connection */
         MongoClient mongoClient = new MongoClient();
         database = mongoClient.getDB("SearchEngine");
     }
