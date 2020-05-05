@@ -7,6 +7,7 @@ import java.util.Map;
 public class DbManager {
     private DB database;
     private static DbManager instance;
+    
     public DbManager(){
     	
         /* Initialize default connection */
@@ -28,6 +29,7 @@ public class DbManager {
         for (Map.Entry<String,List<Integer>> entry : terms.entrySet()) {
             DBObject term = new BasicDBObject()
                     .append("term", entry.getKey())
+                    .append("termFrequency", entry.getValue().size())
                     .append("documents", entry.getValue());
 
             collection.insert(term);
@@ -42,7 +44,8 @@ public class DbManager {
             for (Map.Entry<Integer ,List<Integer>>  document : term.getValue().entrySet()) {
                 DBObject entery = new BasicDBObject()
                     .append("term", term.getKey())
-                    .append("document", document.getValue())
+                    .append("document", document.getKey())
+                    .append("termDocumentFrequency", document.getValue().size())
                     .append("positions" , document.getValue())    ;
 
                  collection.insert(entery);

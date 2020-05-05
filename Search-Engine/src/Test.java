@@ -15,11 +15,6 @@ public class Test {
 
 
         DbManager db = new DbManager();
-        Map<String, List<Integer>> termDictionary = new HashMap<String  , List<Integer>>();
-        List<Integer> lis= new ArrayList<Integer>();
-        lis.add(3);
-        lis.add(300);
-        termDictionary.put("philo" , lis );
-        db.saveTermCollection(termDictionary);
+        
     }
 }
