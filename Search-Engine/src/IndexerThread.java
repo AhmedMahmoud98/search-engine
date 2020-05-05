@@ -65,8 +65,8 @@ public class IndexerThread implements Runnable {
 			/* The Processed Document ID with URL */
 			Map.Entry<Integer, String> documentURL = documentsURLs[i];
 			
-			/* TODO - Tokenization must be done here */ 
-			//document = Tokenization(documentURL);
+			/* Invoke HTMLDocument constrictor to tokenize html  */
+			document = new HTMLDocument(i , documentURL.getValue());
 						
 			/* The Processed Document ID with Its Terms */
 			List<String> terms = document.getTerms();
