@@ -7,7 +7,7 @@ import java.util.LinkedHashMap;
 public class IndexerThread implements Runnable {
 	
 	// Each Thread must write the inverted File to the DB when Reaching certain Memory Limit
-	private final int MEMORY_LIMIT = 640000000;
+	private final int MEMORY_LIMIT = 640000;
 	
 	/* Inverted File Dictionaries */
 	private Map <String, List<Integer>> termDictionary;

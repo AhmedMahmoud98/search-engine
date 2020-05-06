@@ -28,7 +28,7 @@ public class DbManager {
         DBCollection collection = database.getCollection("Term");
 
         for (Map.Entry<String,List<Integer>> entry : terms.entrySet()) {
-            System.out.println(entry.getValue());
+            //System.out.println(entry.getValue());
 //            DBObject term = new BasicDBObject()
 //                    .append("term", entry.getKey())
 //                    .append("termFrequency", entry.getValue().size())
@@ -36,7 +36,7 @@ public class DbManager {
 
             collection.update(new BasicDBObject("term", entry.getKey()),
                     new BasicDBObject("$inc", new BasicDBObject("termFrequency", entry.getValue().size()))
-                                      .append("$push" , new BasicDBObject("documents", entry.getValue()))
+                                      .append("$push" , new BasicDBObject("documents", new BasicDBObject("$each", entry.getValue())))
                                        , true
                                        , false);
             //collection.insert(term);
