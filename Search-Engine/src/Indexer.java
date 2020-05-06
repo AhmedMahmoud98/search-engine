@@ -20,7 +20,7 @@ public class Indexer {
         /* TODO : GET Documents URLS From DB */
     	
     	File file = new File("../urls.txt");   
-    	Scanner sc = new Scanner(file);     //file to be scanned     
+    	Scanner sc = new Scanner(file , "UTF-8");     //file to be scanned
     	int temp = 0;  
     	
     	while(sc.hasNextLine())  
@@ -53,7 +53,7 @@ public class Indexer {
         	thread.join();
         
         timeAfter = System.currentTimeMillis();
-        IndexingTime = timeAfter- timeBefore;
+        IndexingTime = timeAfter - timeBefore;
         System.out.print(String.format("Indexing done at: %d s \n", IndexingTime/1000));
         
         threads.clear();

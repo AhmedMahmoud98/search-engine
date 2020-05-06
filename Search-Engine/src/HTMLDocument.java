@@ -14,7 +14,8 @@ public class HTMLDocument {
 	public HTMLDocument(int docID , String docIP) {
 		terms = new ArrayList<String>();
 		try {
-			Document doc = Jsoup.connect("https://en.wikipedia.org/wiki/People").get();
+			String sanitized = docIP.replaceAll("[\uFEFF-\uFFFF]", "");
+			Document doc = Jsoup.connect(sanitized).get();
 			String docText = doc.text();
 			setTerms(docText);
 		} catch (IOException e) {
@@ -29,7 +30,7 @@ public class HTMLDocument {
 		/* Remove any non alphanumeric charachter */
 		text = text.replaceAll("[^a-zA-Z0-9 ]", ""); // double quotes
 		text = text.toLowerCase();
-		System.out.println(text);
+		//System.out.println(text);
 		String[] temp = text.split("\\s+"); // any number of spaces
 		List<String> stopWords = StopWords.getStopWords();
 
