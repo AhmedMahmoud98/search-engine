@@ -2,6 +2,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -9,12 +10,12 @@ public class HTMLDocument {
 
 	private int documnetID;
 	private List<String> terms;
-	
+
 	public HTMLDocument(int docID , String docIP) {
 		try {
 			Document doc = Jsoup.connect(docIP).get();
 			String docText = doc.text();
-			terms = parse(docText);
+			setTerms(docText);
 		} catch (IOException e) {
 			/* Website refuse to connect */
 			e.printStackTrace();
@@ -23,10 +24,35 @@ public class HTMLDocument {
 		this.documnetID = docID;
 	}
 
-	private List<String> parse(String text){
+	private void setTerms(String text){
+		/* Remove any non alphanumeric charachter */
 		text = text.replaceAll("[^a-zA-Z0-9 | \" *\"]", "");
-		return Arrays.asList(text.split(" "));
+		String[] temp = text.split(" ");
+
+		List<String> stopWords = StopWords.getStopWords();
+
+		/* Stem words */
+		Stemmer stemmer = new Stemmer();
+		for (int i = 0 ; i < temp.length ; i++) {
+			/* Remove stop words */
+			if(!stopWords.contains(temp[i])) {
+				stemmer.add(stringToChar(temp[i]), text.length());
+				stemmer.stem();
+				terms.add(stemmer.toString());
+				stemmer.reset();
+			}
+		}
+
 	}
+
+	private char[] stringToChar(String str) {
+		char[] ch = new char[str.length()];
+		for (int i = 0; i < str.length(); i++) {
+			ch[i] = str.charAt(i);
+		}
+		return ch;
+	}
+
 	public List<String> getTerms() {
 		return terms;
 	}
