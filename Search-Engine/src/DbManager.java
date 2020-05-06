@@ -53,7 +53,7 @@ public class DbManager {
                     .append("termDocumentFrequency", termDocument.getValue().size())
                     .append("positions" , termDocument.getValue())    ;
 
-            System.out.println(entry);
+            //System.out.println(entry);
 
             collection.update(new BasicDBObject("term", termDocument.getKey().term)
                                                 .append("document",termDocument.getKey().docID)

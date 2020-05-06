@@ -27,10 +27,10 @@ public class HTMLDocument {
 
 	private void setTerms(String text){
 		/* Remove any non alphanumeric charachter */
-		text = text.replaceAll("[^a-zA-Z0-9 | \" *\"]", ""); // double quotes
+		text = text.replaceAll("[^a-zA-Z0-9 ]", ""); // double quotes
 		text = text.toLowerCase();
-		//System.out.println(text);
-		String[] temp = text.split(" "); // any number of spaces
+		System.out.println(text);
+		String[] temp = text.split("\\s+"); // any number of spaces
 		List<String> stopWords = StopWords.getStopWords();
 
 		/* Stem words */
