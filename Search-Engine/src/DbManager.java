@@ -34,23 +34,20 @@ public class DbManager {
 
             collection.insert(term);
         }
-
     }
 
-    public void saveDocumentCollection( Map<String , Map<Integer, List<Integer>>> terms){
+    public void saveDocumentCollection( Map<termDocumentKey, List<Integer>> terms){
         DBCollection collection = database.getCollection("Document");
 
-        for (Map.Entry<String ,Map<Integer, List<Integer>>>  term : terms.entrySet()) {
-            for (Map.Entry<Integer ,List<Integer>>  document : term.getValue().entrySet()) {
-                DBObject entery = new BasicDBObject()
-                    .append("term", term.getKey())
-                    .append("document", document.getKey())
-                    .append("termDocumentFrequency", document.getValue().size())
-                    .append("positions" , document.getValue())    ;
+        for (Map.Entry<termDocumentKey, List<Integer>>  termDocument : terms.entrySet()) {
+            DBObject entery = new BasicDBObject()
+                .append("term", termDocument.getKey().term)
+                .append("document", termDocument.getKey().docID)
+                .append("termDocumentFrequency", termDocument.getValue().size())
+                .append("positions" , termDocument.getValue())    ;
 
-                 collection.insert(entery);
-            }
+             collection.insert(entery);
+            
         }
-
     }
 }

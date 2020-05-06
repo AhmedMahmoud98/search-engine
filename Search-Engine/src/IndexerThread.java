@@ -11,7 +11,7 @@ public class IndexerThread implements Runnable {
 	
 	/* Inverted File Dictionaries */
 	private Map <String, List<Integer>> termDictionary;
-	private Map<String, Map<Integer, List<Integer>>> termDocumentDictionary;
+	private Map <termDocumentKey, List<Integer>> termDocumentDictionary;
 	
 	/* The Documents that this Thread should Process */
 	private Map.Entry<Integer, String>[] documentsURLs;
@@ -25,13 +25,13 @@ public class IndexerThread implements Runnable {
 		this.docEndIndex = docEndIdx;
 		this.documentsURLs = docsURLs;
 		
-		this.termDictionary = new LinkedHashMap<String, List<Integer>>();
-		this.termDocumentDictionary = new LinkedHashMap<String, Map<Integer, List<Integer>>>();
+		this.termDictionary = new LinkedHashMap <String, List<Integer>>();
+		this.termDocumentDictionary = new LinkedHashMap <termDocumentKey, List<Integer>>();
 
 	}
 	
 	public void run() {
-		this.constructIndex();
+		constructIndex();
 	}
 
 	/* The Main Function To Loop Through documents and Construct the Index */
@@ -52,7 +52,7 @@ public class IndexerThread implements Runnable {
 			consumedMemory = FreeMemory - currentMemory;
 			
 			/* Check if The Inverted File Exceeded The Memory Limit */
-			if (consumedMemory < this.MEMORY_LIMIT)
+			if (consumedMemory > this.MEMORY_LIMIT)
 			{
 				/* Write The Inverted File to the DB, Remove It from Memory then Continue To Process Documents */ 
 				SortIndex();
@@ -67,7 +67,7 @@ public class IndexerThread implements Runnable {
 			
 			/* Invoke HTMLDocument constrictor to tokenize html  */
 			document = new HTMLDocument(i , documentURL.getValue());
-						
+			
 			/* The Processed Document ID with Its Terms */
 			List<String> terms = document.getTerms();
 			int documentID = document.getDocID();
@@ -79,8 +79,6 @@ public class IndexerThread implements Runnable {
 			for (String term : terms) 
 			{
 				List<Integer> termDocumentsIDs = null;
-				List<Integer> termDocumentPositions= null;
-
 				/* Check If This Term is already appeared in other Document */
 				if (termDictionary.get(term) == null) 
 				{
@@ -94,19 +92,20 @@ public class IndexerThread implements Runnable {
 				
 				/* Add This Document To the Term List */ 
 				termDocumentsIDs.add(documentID);
-				
+
+				List<Integer> termDocumentPositions= null;
+				termDocumentKey Key = new termDocumentKey(term, documentID);
 				/* Check If This Terms is already appeared in This Document */
-				if (termDocumentDictionary.get(term).get(documentID) == null)
+				if (termDocumentDictionary.get(Key) == null)
 				{
 					/* Make a New List For This Term in That Document with Its Position */
-					Map<Integer, List<Integer>> secondMap = new LinkedHashMap<Integer, List<Integer>>();
-					termDocumentPositions = new ArrayList<Integer>();					
-					secondMap.put(documentID, termDocumentPositions);
-					termDocumentDictionary.put(term, secondMap);
+					termDocumentPositions = new ArrayList<Integer>();
+					termDocumentDictionary.put(Key, termDocumentPositions);
+					
 				}
 				else
 					/* Get This Term Positions List */
-					termDocumentPositions = termDocumentDictionary.get(term).get(documentID);
+					termDocumentPositions = termDocumentDictionary.get(Key);
 				
 				/* Add This Position To the Document Term List */ 
 				termDocumentPositions.add(termPosition);

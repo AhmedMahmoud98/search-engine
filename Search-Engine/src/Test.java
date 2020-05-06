@@ -1,20 +1,22 @@
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.io.IOException;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 
 public class Test {
 
-    public static void main(String[] args){
+    public static void main(String[] args) throws IOException, InterruptedException{
 
         /* Remove Mongo Logging */
         Logger mongoLogger = Logger.getLogger( "org.mongodb.driver" );
         mongoLogger.setLevel(Level.SEVERE); // e.g. or Log.WARNING, etc.
-
-
+        
+        Map<Integer, String> URLs = new LinkedHashMap<Integer, String>();
+        
         DbManager db = new DbManager();
+        Indexer Ind = new Indexer();
+        Ind.constructIndex();
         
     }
 }
