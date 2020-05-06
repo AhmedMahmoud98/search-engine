@@ -51,18 +51,8 @@ class Stemmer {
     private static final int INC = 50;
     /* unit of size whereby b is increased */
     public Stemmer() {
-       reset();
-    }
-
-    /**
-     * reset to stem new word
-     */
-
-    public void reset(){
         b = new char[INC];
         i = 0;
-        j = 0 ;
-        k = 0 ;
         i_end = 0;
     }
 

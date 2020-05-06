@@ -1,4 +1,5 @@
 import com.mongodb.*;
+import com.mongodb.client.model.Filters;
 
 import java.util.List;
 import java.util.Map;
@@ -27,12 +28,18 @@ public class DbManager {
         DBCollection collection = database.getCollection("Term");
 
         for (Map.Entry<String,List<Integer>> entry : terms.entrySet()) {
-            DBObject term = new BasicDBObject()
-                    .append("term", entry.getKey())
-                    .append("termFrequency", entry.getValue().size())
-                    .append("documents", entry.getValue());
+            System.out.println(entry.getValue());
+//            DBObject term = new BasicDBObject()
+//                    .append("term", entry.getKey())
+//                    .append("termFrequency", entry.getValue().size())
+//                    .append("documents", entry.getValue());
 
-            collection.insert(term);
+            collection.update(new BasicDBObject("term", entry.getKey()),
+                    new BasicDBObject("$inc", new BasicDBObject("termFrequency", entry.getValue().size()))
+                                      .append("$push" , new BasicDBObject("documents", entry.getValue()))
+                                       , true
+                                       , false);
+            //collection.insert(term);
         }
     }
 
@@ -40,14 +47,23 @@ public class DbManager {
         DBCollection collection = database.getCollection("Document");
 
         for (Map.Entry<termDocumentKey, List<Integer>>  termDocument : terms.entrySet()) {
-            DBObject entery = new BasicDBObject()
-                .append("term", termDocument.getKey().term)
-                .append("document", termDocument.getKey().docID)
-                .append("termDocumentFrequency", termDocument.getValue().size())
-                .append("positions" , termDocument.getValue())    ;
+            DBObject entry = new BasicDBObject()
+                    .append("term", termDocument.getKey().term)
+                    .append("document", termDocument.getKey().docID)
+                    .append("termDocumentFrequency", termDocument.getValue().size())
+                    .append("positions" , termDocument.getValue())    ;
 
-             collection.insert(entery);
-            
+            System.out.println(entry);
+
+            collection.update(new BasicDBObject("term", termDocument.getKey().term)
+                                                .append("document",termDocument.getKey().docID)
+                    , entry
+                    , true
+                    , false);
+
+
+             //collection.insert(entery);
+
         }
     }
 }

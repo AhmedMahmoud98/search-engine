@@ -10,7 +10,7 @@ public class StopWords {
     public static List<String> getStopWords(){
         if(stopWords == null){
             try {
-                stopWords = Files.readAllLines(Paths.get("../assets/stopwords.txt"));
+                stopWords = Files.readAllLines(Paths.get("./assets/stopwords.txt"));
             } catch(IOException ex){
                 System.out.println("Stop words not loaded");
             }

@@ -27,14 +27,13 @@ public class Indexer {
     	{  
     		documentsURLs.put(temp, sc.nextLine());
     		temp++;
-    	}  
-    	 
+    	}
     }
 
     public void constructIndex() throws InterruptedException, IOException {
         getDocumentsURLs();
         
-        final int numOfThreads = (int) Math.ceil(documentsURLs.size() / DOCUMENTS_PER_THREAD);
+        final int numOfThreads = (int) Math.ceil(documentsURLs.size() / (float)DOCUMENTS_PER_THREAD);
         final Map.Entry<Integer, String>[] documentsEntries =
                 (Map.Entry<Integer, String>[]) documentsURLs.entrySet().toArray(new Map.Entry[documentsURLs.size()]);
         

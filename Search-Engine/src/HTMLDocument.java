@@ -12,8 +12,9 @@ public class HTMLDocument {
 	private List<String> terms;
 
 	public HTMLDocument(int docID , String docIP) {
+		terms = new ArrayList<String>();
 		try {
-			Document doc = Jsoup.connect(docIP).get();
+			Document doc = Jsoup.connect("https://en.wikipedia.org/wiki/People").get();
 			String docText = doc.text();
 			setTerms(docText);
 		} catch (IOException e) {
@@ -26,9 +27,10 @@ public class HTMLDocument {
 
 	private void setTerms(String text){
 		/* Remove any non alphanumeric charachter */
-		text = text.replaceAll("[^a-zA-Z0-9 | \" *\"]", "");
-		String[] temp = text.split(" ");
-
+		text = text.replaceAll("[^a-zA-Z0-9 | \" *\"]", ""); // double quotes
+		text = text.toLowerCase();
+		//System.out.println(text);
+		String[] temp = text.split(" "); // any number of spaces
 		List<String> stopWords = StopWords.getStopWords();
 
 		/* Stem words */
@@ -36,13 +38,13 @@ public class HTMLDocument {
 		for (int i = 0 ; i < temp.length ; i++) {
 			/* Remove stop words */
 			if(!stopWords.contains(temp[i])) {
-				stemmer.add(stringToChar(temp[i]), text.length());
+				stemmer.add(stringToChar(temp[i]), temp[i].length());
 				stemmer.stem();
 				terms.add(stemmer.toString());
-				stemmer.reset();
+				// stemmer.reset();
 			}
 		}
-
+		//System.out.println(terms);
 	}
 
 	private char[] stringToChar(String str) {

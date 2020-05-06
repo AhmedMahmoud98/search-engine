@@ -7,7 +7,7 @@ import java.util.LinkedHashMap;
 public class IndexerThread implements Runnable {
 	
 	// Each Thread must write the inverted File to the DB when Reaching certain Memory Limit
-	private final int MEMORY_LIMIT = 640000;
+	private final int MEMORY_LIMIT = 640000000;
 	
 	/* Inverted File Dictionaries */
 	private Map <String, List<Integer>> termDictionary;
@@ -92,7 +92,6 @@ public class IndexerThread implements Runnable {
 				
 				/* Add This Document To the Term List */ 
 				termDocumentsIDs.add(documentID);
-
 				List<Integer> termDocumentPositions= null;
 				termDocumentKey Key = new termDocumentKey(term, documentID);
 				/* Check If This Terms is already appeared in This Document */
@@ -114,6 +113,12 @@ public class IndexerThread implements Runnable {
 				termPosition++;
 			}
 		}
+		/* Write The Inverted File to the DB, Remove It from Memory then Continue To Process Documents */
+		SortIndex();
+		StoreDictonaries();
+
+		termDictionary.clear();
+		termDocumentDictionary.clear();
 	}
 	
 	private void SortIndex() {
