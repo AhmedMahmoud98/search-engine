@@ -3,6 +3,7 @@ import com.mongodb.client.model.Filters;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /* Singleton Pattern */
 public class DbManager {
@@ -24,10 +25,10 @@ public class DbManager {
         return instance;
     }
 
-    public void saveTermCollection( Map<String , List<Integer>> terms){
+    public void saveTermCollection( Map<String , Set<Integer>> terms){
         DBCollection collection = database.getCollection("Term");
 
-        for (Map.Entry<String,List<Integer>> entry : terms.entrySet()) {
+        for (Map.Entry<String,Set<Integer>> entry : terms.entrySet()) {
             //System.out.println(entry.getValue());
 //            DBObject term = new BasicDBObject()
 //                    .append("term", entry.getKey())

@@ -1,16 +1,13 @@
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.LinkedHashMap;
+import java.util.*;
 
 
 public class IndexerThread implements Runnable {
 	
 	// Each Thread must write the inverted File to the DB when Reaching certain Memory Limit
-	private final int MEMORY_LIMIT = 640000;
+	private final int MEMORY_LIMIT = 640000000;
 	
 	/* Inverted File Dictionaries */
-	private Map <String, List<Integer>> termDictionary;
+	private Map <String, Set<Integer>> termDictionary;
 	private Map <termDocumentKey, List<Integer>> termDocumentDictionary;
 	
 	/* The Documents that this Thread should Process */
@@ -25,7 +22,7 @@ public class IndexerThread implements Runnable {
 		this.docEndIndex = docEndIdx;
 		this.documentsURLs = docsURLs;
 		
-		this.termDictionary = new LinkedHashMap <String, List<Integer>>();
+		this.termDictionary = new LinkedHashMap <String, Set<Integer>>();
 		this.termDocumentDictionary = new LinkedHashMap <termDocumentKey, List<Integer>>();
 
 	}
@@ -78,12 +75,12 @@ public class IndexerThread implements Runnable {
 			/* Loop Through All Terms in The File */
 			for (String term : terms) 
 			{
-				List<Integer> termDocumentsIDs = null;
+				Set<Integer> termDocumentsIDs = null;
 				/* Check If This Term is already appeared in other Document */
 				if (termDictionary.get(term) == null) 
 				{
 					/* Make a New List For This Term */
-					termDocumentsIDs = new ArrayList<Integer>();
+					termDocumentsIDs = new HashSet<Integer>();
 					termDictionary.put(term, termDocumentsIDs);
 				}
 				else 
