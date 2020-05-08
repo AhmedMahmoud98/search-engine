@@ -28,16 +28,20 @@ public final class QueryProcessor {
         ArrayList<String> queryProcessed = new ArrayList<String>();
         Stemmer stemmer = new Stemmer();
         boolean phrase = false;
-
+        String phraseWord = "";
         for (String s : temp) {
             if (s.startsWith("\"")){
                 phrase = true;
+                phraseWord = s.replaceAll("[^a-zA-Z0-9 ]", "");
+                continue;
             }
             if (phrase) {
+                phraseWord = phraseWord + " "+ s.replaceAll("[^a-zA-Z0-9 ]", "");
                 if (s.endsWith("\"")){
-                    phrase = false;
+                   phrase = false;
+                   queryProcessed.add(phraseWord);
+                   phraseWord = "";
                 }
-                queryProcessed.add(s.replaceAll("[^a-zA-Z0-9 ]", ""));
             }
             else if (!stopWords.contains(s)) {
                 s = s.replaceAll("[^a-zA-Z0-9 ]", "");
