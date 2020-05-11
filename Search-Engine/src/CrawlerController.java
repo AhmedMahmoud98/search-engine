@@ -1,4 +1,5 @@
 import org.jsoup.Jsoup;
+
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -15,39 +16,45 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Scanner;
 
+
 // JAR File is added to ClassPath in Libraries and marked true on order and export 
 
 public class CrawlerController {
-	public static 	Map<String, ArrayList<String>> robotsDisallowed;
-	public static 	Map<String, HashSet<String>> Refer;
-	public static int NumberOfWebsites;
+	public static 	Map<String, ArrayList<String>> ROBOTS_DISALLOWED;
+	public static int NUMBER_OF_WEBSITES;
+	public static ArrayList<CrawlerObject> LINKS ;
+
 
 	public static void main(String[] args) throws InterruptedException {
 		// Creating The Links Container and The Websites That is Disallowed To join
-		ArrayList<String> links = new ArrayList<String>();
 		ArrayList<String> seeds = new ArrayList<String>();
-		robotsDisallowed = new HashMap<String, ArrayList<String>>();
-		Refer = new HashMap<String, HashSet<String>>();
+		ROBOTS_DISALLOWED = new HashMap<String, ArrayList<String>>();
+		LINKS = new ArrayList<CrawlerObject>();
 	    seeds.add("https://www.geeksforgeeks.org/greedy-algorithms");
 	    seeds.add("https://www.geeksforgeeks.org/computer-network-tutorials");
 		for(int i =0;i<seeds.size();i++) {
 			if(Crawler.CheckRobots(seeds.get(i))) {
-				links.add(seeds.get(i));
+				CrawlerObject c = new CrawlerObject();
+				c.setNumberOfURLs(0);
+				c.setLinkURL(seeds.get(i));
+				LINKS.add(c);
 			}
 		}
 		
 	
 		// Starting The Threads To Start Crawling
 		int numberOfThreads = 5;
-		NumberOfWebsites = 1000;
+		NUMBER_OF_WEBSITES = 1000;
 		int currentIndex = 0;
 		ArrayList<Thread> threads = new ArrayList<Thread>();
 		
-		while (links.size() < NumberOfWebsites) {
+		while (LINKS.size() < NUMBER_OF_WEBSITES) {
 			threads.clear();
 			for (int j = 0; j < numberOfThreads; j++) {
-				if(currentIndex<links.size()) {
-					Crawler c = new Crawler(links.get(currentIndex),links,j);
+				if(currentIndex<LINKS.size()) {
+					CrawlerObject current  = LINKS.get(currentIndex);
+					Crawler c = new Crawler(current,LINKS,j);
+					current.setVisited(true);
 					Thread t = new Thread(c);
 					threads.add(t);
 					t.start();
@@ -66,7 +73,7 @@ public class CrawlerController {
 			
 		}
 		/*
-		 * System.out.print(links.size());
+		 * 
 		 * 
 		 * for (Entry<String, HashSet<String>> entry : Refer.entrySet()) {
 		 * if(!entry.getKey().equals("https://www.geeksforgeeks.org/")) { continue; }
@@ -77,27 +84,75 @@ public class CrawlerController {
 		 * 
 		 * }
 		 */
-		 
+		System.out.print(LINKS.size());
+		for(int i =0;i <LINKS.size();i++) {
+			CrawlerObject temp = LINKS.get(i);
+			if(temp.getLinkURL().equals("https://www.geeksforgeeks.org/")) {
+				System.out.println(temp.getLinkURL());
+				System.out.println(temp.getNumberOfURLs());
+				System.out.println(temp.isVisited());
+				HashSet<String> printTemp = temp.getPointingLinks();
+				Iterator value = printTemp.iterator(); 
+				while (value.hasNext()) {
+					System.out.println(value.next()); 
+					}
+			   System.out.println("FINISHED ITeration");
+				
+				
+				
+			}
+			
+		}
+		
+		
+		SaveRobot();
+		SaveLinks();
 		
 		
 	
 
 	}
+	public static void SaveRobot() {
+		DbManager DBManager = DbManager.getInstance();
+		DBManager.saveRobot(ROBOTS_DISALLOWED);
+	}
+	public static void SaveLinks() {
+		DbManager DBManager = DbManager.getInstance();
+		DBManager.saveCrawler(LINKS);
+	}
 
 }
 
 class Crawler implements Runnable {
-	private ArrayList<String> links;
+	private ArrayList<CrawlerObject> links;
 	
-	private String MyURL;
+	private CrawlerObject mCrawlerObj;
 	private int ThreadNumber;
 	
 
-	public Crawler(String URL, ArrayList<String> links,int ThreadNumber) {
-		this.links = links;
-		MyURL = URL;
+	public Crawler(CrawlerObject mCrawlerObj, ArrayList<CrawlerObject> lINKS2,int ThreadNumber) {
+		this.links = lINKS2;
+		this.mCrawlerObj = mCrawlerObj;
 		this.ThreadNumber = ThreadNumber;
 		
+	}
+	public void AddRefer(String elementURL) {
+		for(int i =0;i <links.size();i++) {
+			CrawlerObject temp = links.get(i);
+			if(temp.getLinkURL().equals(elementURL)) {
+				temp.getPointingLinks().add(mCrawlerObj.getLinkURL());
+				
+			}
+			
+		}
+	}
+	public boolean CheckExist(String URL) {
+		for(int i =0 ; i <links.size();i++) {
+			if(links.get(i).getLinkURL().equals(URL)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	private void getPageLinks(String URL) {
@@ -123,25 +178,18 @@ class Crawler implements Runnable {
 				document = Jsoup.connect(URL).get();
 				// 3. Parse the HTML to extract links to other URLs
 				Elements linksOnPage = document.select("a[href]");
+				mCrawlerObj.setNumberOfURLs(linksOnPage.size());
 
 				// 5. For each extracted URL... go back to Step 4.
 				
 					for (Element page : linksOnPage) {
 						
 						synchronized (links) {
-							if(!CrawlerController.Refer.containsKey(page.attr("abs:href"))) {//New Element doesn't have Refer Before 
-								HashSet<String> tempRefer = new HashSet<String>();
-								tempRefer.add(URL);
-								CrawlerController.Refer.put(page.attr("abs:href"), tempRefer);
-								
-								
-							}
-							else {
-								CrawlerController.Refer.get(page.attr("abs:href")).add(URL);
-								
-							}
-						if (CheckRobots(page.attr("abs:href"))&&!links.contains(page.attr("abs:href"))&&links.size()<CrawlerController.NumberOfWebsites) {
-							links.add(page.attr("abs:href"));
+							AddRefer(page.attr("abs:href"));
+						if (CheckRobots(page.attr("abs:href"))&&!CheckExist(page.attr("abs:href"))&&links.size()<CrawlerController.NUMBER_OF_WEBSITES) {
+							CrawlerObject toBeAdded = new CrawlerObject();
+							toBeAdded.setLinkURL(page.attr("abs:href"));
+							links.add(toBeAdded);
 							
 							//System.out.println(page.attr("abs:href")+" "+ThreadNumber);
 
@@ -182,7 +230,7 @@ class Crawler implements Runnable {
 		////////////////////////////////////// //////////////////////////////////
 		
 
-		if (!CrawlerController.robotsDisallowed.containsKey(filteredURL)) {
+		if (!CrawlerController.ROBOTS_DISALLOWED.containsKey(filteredURL)) {
 			ArrayList<String> disallowed = new ArrayList<String>();
 			
 
@@ -215,17 +263,17 @@ class Crawler implements Runnable {
 
 					}
 				}
-				CrawlerController.robotsDisallowed.put(filteredURL, disallowed);
+				CrawlerController.ROBOTS_DISALLOWED.put(filteredURL, disallowed);
 
 			} catch (Exception e) {
-				CrawlerController.robotsDisallowed.put(filteredURL, disallowed);
+				CrawlerController.ROBOTS_DISALLOWED.put(filteredURL, disallowed);
 				
 			}
 		}
 		
 		/////////////////////////////// Now we have the Robot File Start Searching if
 		/////////////////////////////// its allowed or Not///////////////
-		ArrayList<String> searchInside = CrawlerController.robotsDisallowed.get(filteredURL);
+		ArrayList<String> searchInside = CrawlerController.ROBOTS_DISALLOWED.get(filteredURL);
 		for (int i = 0; i < searchInside.size(); i++) {
 			if (URL.contains(searchInside.get(i))&&!searchInside.get(i).contains("*")) {//In Case Doesn't have to match Two Strings 
 				return false;
@@ -257,7 +305,7 @@ class Crawler implements Runnable {
 	@Override
 	public void run() {
 
-		getPageLinks(MyURL);
+		getPageLinks(mCrawlerObj.getLinkURL());
 
 	}
 

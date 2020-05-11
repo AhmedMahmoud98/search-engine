@@ -1,6 +1,7 @@
 import com.mongodb.*;
 import com.mongodb.client.model.Filters;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -40,6 +41,48 @@ public class DbManager {
                                       .append("$push" , new BasicDBObject("documents", new BasicDBObject("$each", entry.getValue())))
                                        , true
                                        , false);
+            //collection.insert(term);
+        }
+    }
+    public void saveRobot( Map<String , ArrayList<String>> robots){
+        DBCollection collection = database.getCollection("Robot");
+
+        for (Map.Entry<String,ArrayList<String>> entry : robots.entrySet()) {
+            //System.out.println(entry.getValue());
+//            DBObject term = new BasicDBObject()
+//                    .append("term", entry.getKey())
+//                    .append("termFrequency", entry.getValue().size())
+//                    .append("documents", entry.getValue());
+
+            collection.update(new BasicDBObject("Link", entry.getKey()),
+                    new BasicDBObject
+                                      ("$push" , new BasicDBObject("Disallowed", new BasicDBObject("$each", entry.getValue())))
+                                       , true
+                                       , false);
+           
+            //collection.insert(term);
+        }
+    }
+    public void saveCrawler(ArrayList<CrawlerObject> crawled ){
+        DBCollection collection = database.getCollection("CrawlerTable");
+
+        for (int i =0;i<crawled.size();i++) {
+            //System.out.println(entry.getValue());
+//            DBObject term = new BasicDBObject()
+//                    .append("term", entry.getKey())
+//                    .append("termFrequency", entry.getValue().size())
+//                    .append("documents", entry.getValue());
+        	CrawlerObject temp = crawled.get(i);
+
+            collection.update(new BasicDBObject("CrawledIndex", i),
+                    new BasicDBObject("Link",temp.getLinkURL()).append
+                                      ("Source", temp.getPointingLinks())
+                                      .append("Number Of Links", temp.getNumberOfURLs())
+                                      .append("Visited", temp.isVisited())
+                                      .append("CrawledIndex", i)
+                                       , true
+                                       , false);
+           
             //collection.insert(term);
         }
     }
