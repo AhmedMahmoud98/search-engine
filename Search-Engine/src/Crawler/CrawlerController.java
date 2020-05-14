@@ -87,7 +87,7 @@ public class CrawlerController {
 				}
 
 				}
-			}
+			
 			for (int i = 0; i < threads.size(); i++) {
 				threads.get(i).join();
 				
@@ -95,18 +95,20 @@ public class CrawlerController {
 			if (threads.size() == 0) {
 				break;
 			}
+	
 
-		}
+		
 		//Save your Output To DataBase
 		SaveRobots();
 		SaveLinks();
 		//ReCrawlling  and  ReCrawlling Conditions and Time To Check ReCrawlling
-		
-		
-
-		
-
 	}
+	}
+		
+
+		
+
+
 
 	public static void SaveRobots() {
 		DbManager DBManager = DbManager.getInstance();
