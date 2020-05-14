@@ -1,3 +1,4 @@
+package Crawler;
 import org.jsoup.Jsoup;
 
 import org.jsoup.nodes.Document;
@@ -18,8 +19,10 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Scanner;
+
+import DB.*;
+
 
 // JAR File is added to ClassPath in Libraries and marked true on order and export 
 
@@ -83,6 +86,7 @@ public class CrawlerController {
 
 				}
 
+				}
 			}
 			for (int i = 0; i < threads.size(); i++) {
 				threads.get(i).join();
@@ -287,7 +291,6 @@ class Crawler implements Runnable {
 
 			} catch (Exception e) {
 				CrawlerController.ROBOTS_DISALLOWED.put(filteredURL, disallowed);
-
 			}
 		}
 
@@ -314,17 +317,13 @@ class Crawler implements Runnable {
 				if (tempURLMatch.matches(tempMatch)) {
 					return false;
 				}
-
 			}
 		}
-
 		return true;
-
 	}
 
 	@Override
 	public void run() {
-
 		getPageLinks(mCrawlerObj.getLinkURL());
 
 	}

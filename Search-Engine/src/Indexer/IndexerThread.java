@@ -1,4 +1,7 @@
+package Indexer;
 import java.util.*;
+
+import DB.DbManager;
 
 
 public class IndexerThread implements Runnable {
