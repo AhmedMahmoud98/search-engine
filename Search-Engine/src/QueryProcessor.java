@@ -1,17 +1,19 @@
 import java.util.*;
-import java.io.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import TextProcessing.*;
+
 
 public final class QueryProcessor {
     private static String query;
     private QueryProcessor() { query = ""; }
+    
     public static void setQuery(String q){
         query = q;
     }
+    
     public static String getQuery(){
         return query;
     }
+    
     private static char[] stringToChar(String str) {
         char[] ch = new char[str.length()];
         for (int i = 0; i < str.length(); i++) {
@@ -19,6 +21,7 @@ public final class QueryProcessor {
         }
         return ch;
     }
+    
     private static ArrayList<String> process(){
         query = query.toLowerCase();
         // query = query.replaceAll("[^a-zA-Z0-9 ]", "");

@@ -1,9 +1,12 @@
+package Indexer;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
+import TextProcessing.Stemmer;
+import TextProcessing.StopWords;
+
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class HTMLDocument {

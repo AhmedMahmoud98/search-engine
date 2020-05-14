@@ -2,6 +2,10 @@ import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.logging.Logger;
+
+import DB.DbManager;
+import Indexer.Indexer;
+
 import java.util.logging.Level;
 
 public class Test {

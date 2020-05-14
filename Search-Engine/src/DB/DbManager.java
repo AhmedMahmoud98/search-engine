@@ -1,5 +1,9 @@
+package DB;
 import com.mongodb.*;
 import com.mongodb.client.model.Filters;
+
+import Crawler.CrawlerObject;
+import Indexer.termDocumentKey;
 
 import java.util.ArrayList;
 import java.util.List;

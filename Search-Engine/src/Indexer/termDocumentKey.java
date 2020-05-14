@@ -1,3 +1,4 @@
+package Indexer;
 
 public class termDocumentKey {
 	public String term;

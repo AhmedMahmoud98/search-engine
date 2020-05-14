@@ -1,3 +1,4 @@
+package Crawler;
 import org.jsoup.Jsoup;
 
 import org.jsoup.nodes.Document;
@@ -13,8 +14,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Scanner;
+
+import DB.*;
 
 
 // JAR File is added to ClassPath in Libraries and marked true on order and export 
@@ -58,11 +60,8 @@ public class CrawlerController {
 					Thread t = new Thread(c);
 					threads.add(t);
 					t.start();
-					currentIndex++;
-					
-				}
-				
 
+				}
 			}
 			for(int i =0;i<threads.size();i++) {
 				threads.get(i).join();
@@ -97,20 +96,10 @@ public class CrawlerController {
 					System.out.println(value.next()); 
 					}
 			   System.out.println("FINISHED ITeration");
-				
-				
-				
 			}
-			
 		}
-		
-		
 		SaveRobot();
 		SaveLinks();
-		
-		
-	
-
 	}
 	public static void SaveRobot() {
 		DbManager DBManager = DbManager.getInstance();
@@ -256,8 +245,7 @@ class Crawler implements Runnable {
 						String[] slashes = line.split(" ");
 
 						if (slashes[0].equalsIgnoreCase("Disallow:")) {
-							
-							
+								
 							disallowed.add(filteredURL.replace("/robots.txt", "")+ slashes[1]);
 						}
 
@@ -267,7 +255,6 @@ class Crawler implements Runnable {
 
 			} catch (Exception e) {
 				CrawlerController.ROBOTS_DISALLOWED.put(filteredURL, disallowed);
-				
 			}
 		}
 		
@@ -294,17 +281,13 @@ class Crawler implements Runnable {
 				if(tempURLMatch.matches(tempMatch)) {
 					return false;
 				}
-				
 			}
 		}
-
 		return true;
-
 	}
 
 	@Override
 	public void run() {
-
 		getPageLinks(mCrawlerObj.getLinkURL());
 
 	}
