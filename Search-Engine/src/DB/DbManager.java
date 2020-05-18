@@ -1,5 +1,6 @@
 package DB;
 import com.mongodb.*;
+import com.mongodb.client.MongoCursor;
 import com.mongodb.client.model.Filters;
 
 import Crawler.CrawlerObject;
@@ -9,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.bson.Document;
 
 /* Singleton Pattern */
 public class DbManager {
@@ -34,18 +36,12 @@ public class DbManager {
         DBCollection collection = database.getCollection("Term");
 
         for (Map.Entry<String,Set<Integer>> entry : terms.entrySet()) {
-            //System.out.println(entry.getValue());
-//            DBObject term = new BasicDBObject()
-//                    .append("term", entry.getKey())
-//                    .append("termFrequency", entry.getValue().size())
-//                    .append("documents", entry.getValue());
 
             collection.update(new BasicDBObject("term", entry.getKey()),
                     new BasicDBObject("$inc", new BasicDBObject("termFrequency", entry.getValue().size()))
                                       .append("$push" , new BasicDBObject("documents", new BasicDBObject("$each", entry.getValue())))
                                        , true
                                        , false);
-            //collection.insert(term);
         }
     }
     public void saveRobot( Map<String , ArrayList<String>> robots){
@@ -58,9 +54,12 @@ public class DbManager {
 //                    .append("termFrequency", entry.getValue().size())
 //                    .append("documents", entry.getValue());
 
+        	
             collection.update(new BasicDBObject("Link", entry.getKey()),
                     new BasicDBObject
-                                      ("$push" , new BasicDBObject("Disallowed", new BasicDBObject("$each", entry.getValue())))
+                                      ( "Disallowed",  entry.getValue())
+                                      .append("Link", entry.getKey())
+                                      
                                        , true
                                        , false);
            
@@ -78,7 +77,7 @@ public class DbManager {
 //                    .append("documents", entry.getValue());
         	CrawlerObject temp = crawled.get(i);
 
-            collection.update(new BasicDBObject("CrawledIndex", i),
+            collection.update(new BasicDBObject("Link", temp.getLinkURL()),
                     new BasicDBObject("Link",temp.getLinkURL()).append
                                       ("Source", temp.getPointingLinks())
                                       .append("Number Of Links", temp.getNumberOfURLs())
@@ -90,10 +89,29 @@ public class DbManager {
             //collection.insert(term);
         }
     }
+    
+    public DBCursor getRobots(){
+    	DBCollection collection = database.getCollection("Robot");
+    	DBCursor cursor = collection.find();
+    	
+    	return cursor;
+    	
+    	
+    }
+    public DBCursor getCrawledLinks(){
+    	DBCollection collection = database.getCollection("CrawlerTable");
+    	DBCursor cursor = collection.find();
+    	
+    	return cursor;
+    	
+    	
+    }
+    
 
     public void saveDocumentCollection( Map<termDocumentKey, List<Integer>> terms){
         DBCollection collection = database.getCollection("Document");
 
+        List<DBObject> entreis= new ArrayList<DBObject>();
         for (Map.Entry<termDocumentKey, List<Integer>>  termDocument : terms.entrySet()) {
             DBObject entry = new BasicDBObject()
                     .append("term", termDocument.getKey().term)
@@ -101,17 +119,15 @@ public class DbManager {
                     .append("termDocumentFrequency", termDocument.getValue().size())
                     .append("positions" , termDocument.getValue())    ;
 
-            //System.out.println(entry);
-
+            entreis.add(entry);
+            /*
             collection.update(new BasicDBObject("term", termDocument.getKey().term)
                                                 .append("document",termDocument.getKey().docID)
                     , entry
                     , true
                     , false);
-
-
-             //collection.insert(entery);
-
+            */
         }
+        collection.insert(entreis);
     }
 }
