@@ -107,7 +107,6 @@ public class DbManager {
     	
     }
     
-
     public void saveDocumentCollection( Map<termDocumentKey, List<Integer>> terms){
         DBCollection collection = database.getCollection("Document");
 
