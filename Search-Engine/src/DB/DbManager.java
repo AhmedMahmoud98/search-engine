@@ -4,6 +4,7 @@ import com.mongodb.client.MongoCursor;
 import com.mongodb.client.model.Filters;
 
 import Crawler.CrawlerObject;
+import Crawler.SeedsObject;
 import Indexer.termDocumentKey;
 
 import java.util.ArrayList;
@@ -44,16 +45,11 @@ public class DbManager {
                                        , false);
         }
     }
+    ////////////////////////////////////////////////////////CRAWLER DATABASE FUNCTINONS/////////////////////////////////////////////////////////////////////
     public void saveRobot( Map<String , ArrayList<String>> robots){
         DBCollection collection = database.getCollection("Robot");
 
         for (Map.Entry<String,ArrayList<String>> entry : robots.entrySet()) {
-            //System.out.println(entry.getValue());
-//            DBObject term = new BasicDBObject()
-//                    .append("term", entry.getKey())
-//                    .append("termFrequency", entry.getValue().size())
-//                    .append("documents", entry.getValue());
-
         	
             collection.update(new BasicDBObject("Link", entry.getKey()),
                     new BasicDBObject
@@ -63,18 +59,14 @@ public class DbManager {
                                        , true
                                        , false);
            
-            //collection.insert(term);
+        
         }
     }
     public void saveCrawler(ArrayList<CrawlerObject> crawled ){
         DBCollection collection = database.getCollection("CrawlerTable");
 
         for (int i =0;i<crawled.size();i++) {
-            //System.out.println(entry.getValue());
-//            DBObject term = new BasicDBObject()
-//                    .append("term", entry.getKey())
-//                    .append("termFrequency", entry.getValue().size())
-//                    .append("documents", entry.getValue());
+      
         	CrawlerObject temp = crawled.get(i);
 
             collection.update(new BasicDBObject("Link", temp.getLinkURL()),
@@ -86,12 +78,26 @@ public class DbManager {
                                        , true
                                        , false);
            
-            //collection.insert(term);
         }
     }
+    public void saveSeeds(ArrayList<SeedsObject> seeds) {
+    	DBCollection collection = database.getCollection("SeedsTable");
+    	for (int i =0;i<seeds.size();i++) {
+    	      
+        	SeedsObject temp = seeds.get(i);
+
+            collection.update(new BasicDBObject("Link", temp.getLink()),
+                    new BasicDBObject("Link",temp.getLink())
+                                      .append("Content", temp.getBody())
+                                       , true
+                                       , false);
+           
+        }
+    	
+    }
     
-    public DBCursor getRobots(){
-    	DBCollection collection = database.getCollection("Robot");
+    public DBCursor getSeeds(){
+    	DBCollection collection = database.getCollection("SeedsTable");
     	DBCursor cursor = collection.find();
     	
     	return cursor;
@@ -106,6 +112,15 @@ public class DbManager {
     	
     	
     }
+    public DBCursor getRobots(){
+    	DBCollection collection = database.getCollection("Robot");
+    	DBCursor cursor = collection.find();
+    	
+    	return cursor;
+    	
+    	
+    }
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     
     public void saveDocumentCollection( Map<termDocumentKey, List<Integer>> terms){
         DBCollection collection = database.getCollection("Document");
