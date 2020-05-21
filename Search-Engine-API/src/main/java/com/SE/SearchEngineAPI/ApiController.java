@@ -4,11 +4,9 @@ import java.util.*;
 import Models.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 
 @CrossOrigin(origins = "http://localhost:4200")
 @RestController
@@ -19,9 +17,11 @@ public class ApiController {
   VisitedUrlsRepository visitedUrlsRepository;
   @Autowired
   SuggestionsRepository suggestionsRepository;
-  
+  @Autowired
+  private TrendsService trendsService;
+ 
   @GetMapping("/images")
-  public ResponseEntity<List<Image>> getImages(@RequestBody Query query ) {
+  public ResponseEntity<List<Image>> getImages(@RequestBody CustomQuery query ) {
 	  try {
 		    List<Image> Images = new ArrayList<Image>();
 		    /** 
@@ -40,40 +40,39 @@ public class ApiController {
   }
 
   @GetMapping("/pages")
-  public ResponseEntity<List<Page>> getPages (@RequestBody Query query ) {
+  public ResponseEntity<List<Page>> getPages (@RequestBody CustomQuery query ) {
 	  try {
+		  	//suggestionsRepository.incFreq(query.getQueryString());
 		    List<Page> Pages = new ArrayList<Page>();
+		    trendsService.extractTrends(query);
+		    
 		    /** 
 		     * Run Query Processor and Ranker Here
 		     *  then return array of Pages 
 		     */
-		    
-		    
-		    suggestionsRepository.incFreq(query.getQueryString());
+
 		    if (Pages.isEmpty()) {
 		      return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 		    }
-		    
+
 		    return new ResponseEntity<>(Pages, HttpStatus.OK);
 		  } catch (Exception e) {
+			System.out.println(e);
 		    return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
 		  }
   }
   
   @GetMapping("/Trends")
-  public ResponseEntity<List<Trend>> getTrends () {
+  public ResponseEntity<List<Trend>> getTrends (@RequestParam String country) {
 	  try {
-		    List<Trend> Trends = new ArrayList<Trend>();
-		    /**
-		     * Get 1st 10 Trends From DB directly
-		     * Collection => Trends
-		     */
-		    
-		    if (Trends.isEmpty()) {
+		    List<Trend> trends = new ArrayList<Trend>();
+		    trends = trendsService.getTrends(country);
+		
+		    if (trends.isEmpty()) {
 		      return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 		    }
 
-		    return new ResponseEntity<>(Trends, HttpStatus.OK);
+		    return new ResponseEntity<>(trends, HttpStatus.OK);
 		  } catch (Exception e) {
 		    return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
 		  }
@@ -84,11 +83,8 @@ public class ApiController {
 	  
 	  try {
 		    List<Suggestion> suggestions = new ArrayList<>();
-		    
 		    System.out.println(query);
 		    suggestions = suggestionsRepository.findBySearchStringStartingWithOrderByFrequencyDesc(query.toLowerCase() , PageRequest.of(0, 7) );
-		    System.out.println(suggestions);
-		    
 		    if (suggestions.isEmpty()) {
 		      return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 		    }

@@ -1,15 +1,15 @@
 package Models;
 
-public class Query {
+public class CustomQuery {
   
   private String queryString;
   private String userLocation;
   
-  public Query() {
+  public CustomQuery() {
 
   }
 
-  public Query(String qryString,String usrLocation) {
+  public CustomQuery(String qryString,String usrLocation) {
     this.queryString = qryString;
     this.userLocation = usrLocation;
   }
@@ -28,5 +28,10 @@ public class Query {
 
   public void setUserLocation(String usrLocation) {
     this.userLocation = usrLocation;
+  }
+  
+  @Override
+  public String toString() {
+    return "Query [queryString=" + this.queryString + ", userLocation=" + this.userLocation +"]";
   }
 }
