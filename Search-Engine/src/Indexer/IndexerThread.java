@@ -55,7 +55,6 @@ public class IndexerThread implements Runnable {
 			if (consumedMemory > this.MEMORY_LIMIT)
 			{
 				/* Write The Inverted File to the DB, Remove It from Memory then Continue To Process Documents */ 
-				SortIndex();
 				StoreDictonaries();
 				
 				termDictionary.clear();
@@ -114,18 +113,10 @@ public class IndexerThread implements Runnable {
 			}
 		}
 		/* Write The Inverted File to the DB, Remove It from Memory then Continue To Process Documents */
-		SortIndex();
 		StoreDictonaries();
-
 		termDictionary.clear();
 		termDocumentDictionary.clear();
 	}
-	
-	private void SortIndex() {
-	/* TODO : It may done here or using DB */
-		
-	}
-
 	
 	private void StoreDictonaries() {
 		DbManager DBManager = DbManager.getInstance();

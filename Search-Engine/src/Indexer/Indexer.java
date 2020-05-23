@@ -9,7 +9,7 @@ import java.util.Scanner;
 
 public class Indexer {
 
-    private final int DOCUMENTS_PER_THREAD = 10;
+    private final int DOCUMENTS_PER_THREAD = 500;
     private Map<Integer, String> documentsURLs;
 
 

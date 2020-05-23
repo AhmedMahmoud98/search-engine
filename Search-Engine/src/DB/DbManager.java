@@ -121,7 +121,6 @@ public class DbManager {
     public DBCursor getCrawledLinks(){
     	DBCollection collection = database.getCollection("CrawlerTable");
     	DBCursor cursor = collection.find();
-    	
     	return cursor;
     }
     
