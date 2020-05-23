@@ -70,8 +70,7 @@ public class TrendsService {
     	  Criteria c = new Criteria().where("country").is(country); 
     	  query.with(Sort.by(Sort.Direction.DESC, "frequency"))
     	  .addCriteria(c)
-    	  .limit(10)
-    	  .fields().exclude("country");
+    	  .limit(7);
 
     	  return this.mongoOperations.find(query, Trend.class);
     }

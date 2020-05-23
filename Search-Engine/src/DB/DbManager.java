@@ -32,7 +32,7 @@ public class DbManager {
 
         return instance;
     }
-
+//////////////////////////iNDEXER DATABASE FUNCTINONS/////////////////////////////////
     public void saveTermCollection( Map<String , Set<Integer>> terms){
         DBCollection collection = database.getCollection("Term");
 
@@ -43,9 +43,26 @@ public class DbManager {
                                       .append("$push" , new BasicDBObject("documents", new BasicDBObject("$each", entry.getValue())))
                                        , true
                                        , false);
+        
         }
     }
-    ////////////////////////////////////////////////////////CRAWLER DATABASE FUNCTINONS/////////////////////////////////////////////////////////////////////
+    
+    public void saveDocumentCollection( Map<termDocumentKey, List<Integer>> terms){
+        DBCollection collection = database.getCollection("Document");
+
+        List<DBObject> entreis= new ArrayList<DBObject>();
+        for (Map.Entry<termDocumentKey, List<Integer>>  termDocument : terms.entrySet()) {
+            DBObject entry = new BasicDBObject()
+                    .append("term", termDocument.getKey().term)
+                    .append("document", termDocument.getKey().docID)
+                    .append("termDocumentFrequency", termDocument.getValue().size())
+                    .append("positions" , termDocument.getValue())    ;
+
+            entreis.add(entry);
+        }
+        collection.insert(entreis);
+    }
+    //////////////////////////CRAWLER DATABASE FUNCTINONS/////////////////////////////////
     public void saveRobot( Map<String , ArrayList<String>> robots){
         DBCollection collection = database.getCollection("Robot");
 
@@ -58,10 +75,9 @@ public class DbManager {
                                       
                                        , true
                                        , false);
-           
-        
         }
     }
+    
     public void saveCrawler(ArrayList<CrawlerObject> crawled ){
         DBCollection collection = database.getCollection("CrawlerTable");
 
@@ -80,6 +96,7 @@ public class DbManager {
            
         }
     }
+    
     public void saveSeeds(ArrayList<SeedsObject> seeds) {
     	DBCollection collection = database.getCollection("SeedsTable");
     	for (int i =0;i<seeds.size();i++) {
@@ -91,9 +108,7 @@ public class DbManager {
                                       .append("Content", temp.getBody())
                                        , true
                                        , false);
-           
         }
-    	
     }
     
     public DBCursor getSeeds(){
@@ -101,47 +116,22 @@ public class DbManager {
     	DBCursor cursor = collection.find();
     	
     	return cursor;
-    	
-    	
     }
+    
     public DBCursor getCrawledLinks(){
     	DBCollection collection = database.getCollection("CrawlerTable");
     	DBCursor cursor = collection.find();
     	
     	return cursor;
-    	
-    	
     }
+    
     public DBCursor getRobots(){
     	DBCollection collection = database.getCollection("Robot");
     	DBCursor cursor = collection.find();
     	
     	return cursor;
-    	
-    	
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     
-    public void saveDocumentCollection( Map<termDocumentKey, List<Integer>> terms){
-        DBCollection collection = database.getCollection("Document");
 
-        List<DBObject> entreis= new ArrayList<DBObject>();
-        for (Map.Entry<termDocumentKey, List<Integer>>  termDocument : terms.entrySet()) {
-            DBObject entry = new BasicDBObject()
-                    .append("term", termDocument.getKey().term)
-                    .append("document", termDocument.getKey().docID)
-                    .append("termDocumentFrequency", termDocument.getValue().size())
-                    .append("positions" , termDocument.getValue())    ;
-
-            entreis.add(entry);
-            /*
-            collection.update(new BasicDBObject("term", termDocument.getKey().term)
-                                                .append("document",termDocument.getKey().docID)
-                    , entry
-                    , true
-                    , false);
-            */
-        }
-        collection.insert(entreis);
-    }
 }

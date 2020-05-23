@@ -19,33 +19,19 @@ public class ApiController {
   SuggestionsRepository suggestionsRepository;
   @Autowired
   private TrendsService trendsService;
+  @Autowired
+  private SuggestionsService suggestionsService;
  
-  @GetMapping("/images")
-  public ResponseEntity<List<Image>> getImages(@RequestBody CustomQuery query ) {
+ 
+  @GetMapping("/Pages")
+  public ResponseEntity<List<Page>> getPages (@RequestParam String query,
+		  									  @RequestParam String country,
+		  									  @RequestParam String pageNumber) {
 	  try {
-		    List<Image> Images = new ArrayList<Image>();
-		    /** 
-		     * Run Query Processor and Ranker Here
-		     *  then return array of Images 
-		     */
-		    
-		    if (Images.isEmpty()) {
-		      return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-		    }
-
-		    return new ResponseEntity<>(Images, HttpStatus.OK);
-		  } catch (Exception e) {
-		    return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-		  }
-  }
-
-  @GetMapping("/pages")
-  public ResponseEntity<List<Page>> getPages (@RequestBody CustomQuery query ) {
-	  try {
-		  	//suggestionsRepository.incFreq(query.getQueryString());
+		  	CustomQuery _query = new CustomQuery(query, country, Integer.valueOf(pageNumber));
+		    trendsService.extractTrends(_query);
+		    suggestionsService.saveSuggestion(query);
 		    List<Page> Pages = new ArrayList<Page>();
-		    trendsService.extractTrends(query);
-		    
 		    /** 
 		     * Run Query Processor and Ranker Here
 		     *  then return array of Pages 
@@ -62,12 +48,33 @@ public class ApiController {
 		  }
   }
   
+  @GetMapping("/Images")
+  public ResponseEntity<List<Image>> getImages(@RequestParam String query,
+			  									@RequestParam String country,
+			  									@RequestParam String pageNumber) {
+	  try {
+		    CustomQuery _query = new CustomQuery(query, country, Integer.valueOf(pageNumber));
+		    List<Image> Images = new ArrayList<Image>();
+		    /** 
+		     * Run Query Processor and Ranker Here
+		     *  then return array of Images 
+		     */
+		    
+		    if (Images.isEmpty()) {
+		      return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+		    }
+		    return new ResponseEntity<>(Images, HttpStatus.OK);
+		  } catch (Exception e) {
+		    return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+		  }
+  }
+
   @GetMapping("/Trends")
   public ResponseEntity<List<Trend>> getTrends (@RequestParam String country) {
 	  try {
 		    List<Trend> trends = new ArrayList<Trend>();
 		    trends = trendsService.getTrends(country);
-		
+		    
 		    if (trends.isEmpty()) {
 		      return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 		    }
@@ -78,12 +85,11 @@ public class ApiController {
 		  }
   }
   
-  @GetMapping("/suggestions")
+  @GetMapping("/Suggestions")
   public ResponseEntity<List<String>> getSuggestions (@RequestParam String query) {
 	  
 	  try {
 		    List<Suggestion> suggestions = new ArrayList<>();
-		    System.out.println(query);
 		    suggestions = suggestionsRepository.findBySearchStringStartingWithOrderByFrequencyDesc(query.toLowerCase() , PageRequest.of(0, 7) );
 		    if (suggestions.isEmpty()) {
 		      return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -93,16 +99,11 @@ public class ApiController {
 		  } catch (Exception e) {
 		    return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
 		  }
-		  
   }
 
   @PostMapping("/VisitedUrls")
   public ResponseEntity<VisitedUrl> createTutorial(@RequestBody VisitedUrl visitedUrl) {
 	  try {
-		  /**
-		   * The ID sent from client is usless, we should save the real document ID
-		   * 34an Ali Khaled E3rf Egeb Byanat 2l document dh mn 2l table 2l tany elly feh 2lDoc IDS 
-		   */
 		  VisitedUrl _visitedURL = visitedUrlsRepository.save(new VisitedUrl(visitedUrl.getId(), visitedUrl.getVisitedUrl()));
 		  return new ResponseEntity<>(_visitedURL, HttpStatus.CREATED);
 		  } catch (Exception e) {

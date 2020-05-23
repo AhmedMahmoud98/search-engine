@@ -4,14 +4,16 @@ public class CustomQuery {
   
   private String queryString;
   private String userLocation;
+  private int pageNumber;
   
   public CustomQuery() {
 
   }
 
-  public CustomQuery(String qryString,String usrLocation) {
+  public CustomQuery(String qryString, String usrLocation, int _pageNumber) {
     this.queryString = qryString;
     this.userLocation = usrLocation;
+    this.pageNumber = _pageNumber;
   }
 
   public String getQueryString() {
@@ -20,6 +22,14 @@ public class CustomQuery {
 
   public String getUserLocation() {
     return userLocation;
+  }
+  
+  public int getPageNumber() {
+	return pageNumber;
+  }
+
+  public void setpageNumber(int _pageNumber) {
+	this.pageNumber = _pageNumber;
   }
 
   public void setQueryString(String qryString) {
@@ -32,6 +42,8 @@ public class CustomQuery {
   
   @Override
   public String toString() {
-    return "Query [queryString=" + this.queryString + ", userLocation=" + this.userLocation +"]";
+    return "Query [queryString=" + this.queryString + 
+    		", userLocation=" + this.userLocation + 
+    		", pageNumber=" + this.pageNumber + "]";
   }
 }
