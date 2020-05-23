@@ -4,11 +4,13 @@ import java.util.Objects;
 
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "Trends")
+@CompoundIndex(name = "keyindex", def = "{'trendName' : 1, 'country' : 1}")
+
 public class Trend {
-	@Id
 	private String trendName;
 	private String country;
 	private int frequency;
