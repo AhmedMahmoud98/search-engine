@@ -5,6 +5,7 @@ import java.util.logging.Logger;
 
 import DB.DbManager;
 import Indexer.Indexer;
+import Ranker.PageRank;
 
 import java.util.logging.Level;
 
@@ -19,8 +20,8 @@ public class Test {
         Map<Integer, String> URLs = new LinkedHashMap<Integer, String>();
         
         DbManager db = new DbManager();
-        Indexer Ind = new Indexer();
-        Ind.constructIndex();
-        
+        PageRank Ind = new PageRank(3, 0.7);
+        PageRank.main(new String[]{""});
+
     }
 }

@@ -125,7 +125,7 @@ public class DbManager {
     public void saveDocumentCollection( Map<termDocumentKey, List<Integer>> terms){
         DBCollection collection = database.getCollection("Document");
 
-        List<DBObject> entreis= new ArrayList<DBObject>();
+        List<DBObject> entries= new ArrayList<DBObject>();
         for (Map.Entry<termDocumentKey, List<Integer>>  termDocument : terms.entrySet()) {
             DBObject entry = new BasicDBObject()
                     .append("term", termDocument.getKey().term)
@@ -133,7 +133,7 @@ public class DbManager {
                     .append("termDocumentFrequency", termDocument.getValue().size())
                     .append("positions" , termDocument.getValue())    ;
 
-            entreis.add(entry);
+            entries.add(entry);
             /*
             collection.update(new BasicDBObject("term", termDocument.getKey().term)
                                                 .append("document",termDocument.getKey().docID)
@@ -142,6 +142,20 @@ public class DbManager {
                     , false);
             */
         }
-        collection.insert(entreis);
+        collection.insert(entries);
+    }
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    public void savePageRank(Map<String, Double> pageRank) {
+        DBCollection collection = database.getCollection("PopularityTable");
+
+        List<DBObject> entries= new ArrayList<DBObject>();
+        for(Map.Entry<String, Double> link : pageRank.entrySet()){
+            DBObject entry = new BasicDBObject()
+                    .append("link", link.getKey())
+                    .append("popularity", link.getValue());
+            entries.add(entry);
+        }
+        collection.insert(entries);
     }
 }
