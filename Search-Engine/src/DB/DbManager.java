@@ -108,13 +108,11 @@ public class DbManager {
 
         return collection.find();
 
-
     }
     public DBCursor getRobots(){
     	DBCollection collection = database.getCollection("Robot");
 
         return collection.find();
-
 
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -154,5 +152,11 @@ public class DbManager {
             entries.add(entry);
         }
         collection.insert(entries);
+    }
+    public DBCursor getPageRank(){
+        DBCollection collection = database.getCollection("PopularityTable");
+
+        return collection.find();
+
     }
 }
