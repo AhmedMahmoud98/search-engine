@@ -10,7 +10,7 @@ public class IndexerThread implements Runnable {
 	private final int MEMORY_LIMIT = 640000000;
 	
 	/* Inverted File Dictionaries */
-	private Map <String, Set<Integer>> termDictionary;
+	private Map <String, Set<String>> termDictionary;
 	private Map <termDocumentKey, List<Integer>> termDocumentDictionary;
 	
 	/* The Documents that this Thread should Process */
@@ -25,7 +25,7 @@ public class IndexerThread implements Runnable {
 		this.docEndIndex = docEndIdx;
 		this.documentsURLs = docsURLs;
 		
-		this.termDictionary = new LinkedHashMap <String, Set<Integer>>();
+		this.termDictionary = new LinkedHashMap <String, Set<String>>();
 		this.termDocumentDictionary = new LinkedHashMap <termDocumentKey, List<Integer>>();
 
 	}
@@ -44,6 +44,10 @@ public class IndexerThread implements Runnable {
 		int FreeMemory = (int) java.lang.Runtime.getRuntime().freeMemory();
 		int consumedMemory =  0;
 		
+		/* Store Number of words at each Document */
+		Map<String, Integer> documentsSizes = new LinkedHashMap<String, Integer>();
+		int documentsIterator = 0;
+		
 		/* Iterate Through Portion of The Documents that Assigned to that Thread */
 		for(int i = docStartIndex ;i < docEndIndex; i++) 
 		{
@@ -55,7 +59,7 @@ public class IndexerThread implements Runnable {
 			if (consumedMemory > this.MEMORY_LIMIT)
 			{
 				/* Write The Inverted File to the DB, Remove It from Memory then Continue To Process Documents */ 
-				StoreDictonaries();
+				StoreDictonaries(documentsSizes);
 				
 				termDictionary.clear();
 				termDocumentDictionary.clear();
@@ -65,34 +69,36 @@ public class IndexerThread implements Runnable {
 			Map.Entry<Integer, String> documentURL = documentsURLs[i];
 			
 			/* Invoke HTMLDocument constrictor to tokenize html  */
-			document = new HTMLDocument(i , documentURL.getValue());
+			document = new HTMLDocument(documentURL.getValue());
 			
 			/* The Processed Document ID with Its Terms */
 			List<String> terms = document.getTerms();
-			int documentID = document.getDocID();
 			
+			/* Save The document Number of Words to Calculate the term frequency */
+			documentsSizes.put(documentURL.getValue(), document.getTerms().size());
+
 			/* Variable Used To Track Each Term Position in the Document */
 			int termPosition = 0;
 			
 			/* Loop Through All Terms in The File */
 			for (String term : terms) 
 			{
-				Set<Integer> termDocumentsIDs = null;
+				Set<String> termDocumentsUrls = null;
 				/* Check If This Term is already appeared in other Document */
 				if (termDictionary.get(term) == null) 
 				{
 					/* Make a New List For This Term */
-					termDocumentsIDs = new HashSet<Integer>();
-					termDictionary.put(term, termDocumentsIDs);
+					termDocumentsUrls = new HashSet<String>();
+					termDictionary.put(term, termDocumentsUrls);
 				}
 				else 
 					/* Get This Term List */
-					termDocumentsIDs = termDictionary.get(term);
+					termDocumentsUrls = termDictionary.get(term);
 				
 				/* Add This Document To the Term List */ 
-				termDocumentsIDs.add(documentID);
+				termDocumentsUrls.add(documentURL.getValue());
 				List<Integer> termDocumentPositions= null;
-				termDocumentKey Key = new termDocumentKey(term, documentID);
+				termDocumentKey Key = new termDocumentKey(term, documentURL.getValue());
 				/* Check If This Terms is already appeared in This Document */
 				if (termDocumentDictionary.get(Key) == null)
 				{
@@ -111,17 +117,19 @@ public class IndexerThread implements Runnable {
 				/* Go To The Next Position */
 				termPosition++;
 			}
+			documentsIterator++;
 		}
 		/* Write The Inverted File to the DB, Remove It from Memory then Continue To Process Documents */
-		StoreDictonaries();
+		StoreDictonaries(documentsSizes);
 		termDictionary.clear();
 		termDocumentDictionary.clear();
+		documentsSizes.clear();
 	}
 	
-	private void StoreDictonaries() {
+	private void StoreDictonaries(Map<String, Integer> documentsSizes) {
 		DbManager DBManager = DbManager.getInstance();
 		DBManager.saveTermCollection(termDictionary);
-		DBManager.saveDocumentCollection(termDocumentDictionary);
+		DBManager.saveDocumentCollection(termDocumentDictionary, documentsSizes);
 	}
 }
 	

@@ -33,18 +33,6 @@ public class DbManager {
         return instance;
     }
 
-    public void saveTermCollection( Map<String , Set<Integer>> terms){
-        DBCollection collection = database.getCollection("Term");
-
-        for (Map.Entry<String,Set<Integer>> entry : terms.entrySet()) {
-
-            collection.update(new BasicDBObject("term", entry.getKey()),
-                    new BasicDBObject("$inc", new BasicDBObject("termFrequency", entry.getValue().size()))
-                                      .append("$push" , new BasicDBObject("documents", new BasicDBObject("$each", entry.getValue())))
-                                       , true
-                                       , false);
-        }
-    }
     ////////////////////////////////////////////////////////CRAWLER DATABASE FUNCTINONS/////////////////////////////////////////////////////////////////////
     public void saveRobot( Map<String , ArrayList<String>> robots){
         DBCollection collection = database.getCollection("Robot");
@@ -116,26 +104,31 @@ public class DbManager {
 
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    
+    public void saveTermCollection( Map<String , Set<String>> terms){
+        DBCollection collection = database.getCollection("Term");
 
-    public void saveDocumentCollection( Map<termDocumentKey, List<Integer>> terms){
+        for (Map.Entry<String,Set<String>> entry : terms.entrySet()) {
+
+            collection.update(new BasicDBObject("term", entry.getKey()),
+                    new BasicDBObject("$inc", new BasicDBObject("termDocumentsFreq", entry.getValue().size()))
+                                      .append("$push" , new BasicDBObject("documents", new BasicDBObject("$each", entry.getValue())))
+                                       , true
+                                       , false);
+        }
+    }
+    public void saveDocumentCollection( Map<termDocumentKey, List<Integer>> terms, Map<String, Integer> documentsSizes){
         DBCollection collection = database.getCollection("Document");
-
+        int indexIterator = 0;
         List<DBObject> entries= new ArrayList<DBObject>();
         for (Map.Entry<termDocumentKey, List<Integer>>  termDocument : terms.entrySet()) {
             DBObject entry = new BasicDBObject()
                     .append("term", termDocument.getKey().term)
-                    .append("document", termDocument.getKey().docID)
-                    .append("termDocumentFrequency", termDocument.getValue().size())
-                    .append("positions" , termDocument.getValue())    ;
+                    .append("document", termDocument.getKey().docUrl)
+                    .append("termFrequency", termDocument.getValue().size()/(float)documentsSizes.get(termDocument.getKey().docUrl))
+                    .append("positions" , termDocument.getValue());
 
             entries.add(entry);
-            /*
-            collection.update(new BasicDBObject("term", termDocument.getKey().term)
-                                                .append("document",termDocument.getKey().docID)
-                    , entry
-                    , true
-                    , false);
-            */
         }
         collection.insert(entries);
     }

@@ -2,11 +2,11 @@ package Indexer;
 
 public class termDocumentKey {
 	public String term;
-	public int docID;
+	public String docUrl;
 
-	public termDocumentKey(String trm, int dcID) {
+	public termDocumentKey(String trm, String dcID) {
 		this.term = trm;
-		this.docID = dcID;
+		this.docUrl = dcID;
     }
 
 	@Override   
@@ -15,12 +15,12 @@ public class termDocumentKey {
 			return false;
 		
 		termDocumentKey ref = (termDocumentKey)obj;
-		return this.term.equals(ref.term) && this.docID == ref.docID;
+		return this.term.equals(ref.term) && this.docUrl.equals(ref.docUrl);
 	}
 
     @Override
     public int hashCode() {
-        return term.hashCode() ^ docID;
+        return term.hashCode() ^ docUrl.hashCode();
     }
 
 }
