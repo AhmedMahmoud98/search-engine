@@ -58,8 +58,8 @@ public class DbManager {
         	CrawlerObject temp = crawled.get(i);
 
             collection.update(new BasicDBObject("Link", temp.getLinkURL()),
-                    new BasicDBObject("Link",temp.getLinkURL()).append
-                                      ("Source", temp.getPointingLinks())
+                    new BasicDBObject("Link",temp.getLinkURL())
+                    				   .append("Source", temp.getPointingLinks())
                                       .append("Number Of Links", temp.getNumberOfURLs())
                                       .append("Visited", temp.isVisited())
                                       .append("CrawledIndex", i)
