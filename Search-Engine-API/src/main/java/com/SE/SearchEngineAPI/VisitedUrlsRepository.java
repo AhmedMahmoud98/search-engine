@@ -4,5 +4,5 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 
 import Models.VisitedUrl;
 public interface VisitedUrlsRepository extends 
-		MongoRepository<VisitedUrl, String> {
+		MongoRepository<VisitedUrl, Integer> {
 	}
