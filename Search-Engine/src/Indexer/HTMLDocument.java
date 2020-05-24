@@ -11,10 +11,9 @@ import java.util.List;
 
 public class HTMLDocument {
 
-	private int documnetID;
 	private List<String> terms;
 
-	public HTMLDocument(int docID , String docIP) {
+	public HTMLDocument(String docIP) {
 		terms = new ArrayList<String>();
 		try {
 			String sanitized = docIP.replaceAll("[\uFEFF-\uFFFF]", "");
@@ -26,7 +25,6 @@ public class HTMLDocument {
 			e.printStackTrace();
 		}
 		//this.terms = docIP.toString();
-		this.documnetID = docID;
 	}
 
 	private void setTerms(String text){
@@ -62,9 +60,4 @@ public class HTMLDocument {
 	public List<String> getTerms() {
 		return terms;
 	}
-
-	public int getDocID() {
-		return documnetID;
-	}
-
 }

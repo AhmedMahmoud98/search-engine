@@ -15,7 +15,7 @@ public class TrendsExtractor implements Runnable {
 	
 	public TrendsExtractor(List<String> _Queries) throws IOException {
 		Queries = _Queries;
-		
+		/*
 		// load the name extraction model from file
         InputStream is = new FileInputStream("en-ner-person.bin");
         TokenNameFinderModel model = new TokenNameFinderModel(is);
@@ -23,6 +23,7 @@ public class TrendsExtractor implements Runnable {
  
         // feed the model to name finder class
         nameFinder = new NameFinderME(model);
+        */
 	}
 	
 	public void run()  {
@@ -30,7 +31,7 @@ public class TrendsExtractor implements Runnable {
 	}
 	
 	
-    public void processQueries() {
+    public void processQueries() {/*
     	Span nameSpans[];
     	String[] Query;
     	String extractedName = null;
@@ -46,8 +47,10 @@ public class TrendsExtractor implements Runnable {
     	            	extractedName += Query[index];
     	            }
     			}
-    			/* TODO: Write Trends in DB */
+    			
     		}
+    
     	}
+*/
     }
 } 

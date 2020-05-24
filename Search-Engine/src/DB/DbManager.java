@@ -33,57 +33,45 @@ public class DbManager {
         return instance;
     }
 
-    public void saveTermCollection( Map<String , Set<Integer>> terms){
-        DBCollection collection = database.getCollection("Term");
-
-        for (Map.Entry<String,Set<Integer>> entry : terms.entrySet()) {
-
-            collection.update(new BasicDBObject("term", entry.getKey()),
-                    new BasicDBObject("$inc", new BasicDBObject("termFrequency", entry.getValue().size()))
-                                      .append("$push" , new BasicDBObject("documents", new BasicDBObject("$each", entry.getValue())))
-                                       , true
-                                       , false);
-        }
-    }
     ////////////////////////////////////////////////////////CRAWLER DATABASE FUNCTINONS/////////////////////////////////////////////////////////////////////
     public void saveRobot( Map<String , ArrayList<String>> robots){
         DBCollection collection = database.getCollection("Robot");
 
         for (Map.Entry<String,ArrayList<String>> entry : robots.entrySet()) {
-        	
+
             collection.update(new BasicDBObject("Link", entry.getKey()),
                     new BasicDBObject
                                       ( "Disallowed",  entry.getValue())
                                       .append("Link", entry.getKey())
-                                      
+
                                        , true
                                        , false);
-           
-        
+
+
         }
     }
     public void saveCrawler(ArrayList<CrawlerObject> crawled ){
         DBCollection collection = database.getCollection("CrawlerTable");
 
         for (int i =0;i<crawled.size();i++) {
-      
+
         	CrawlerObject temp = crawled.get(i);
 
             collection.update(new BasicDBObject("Link", temp.getLinkURL()),
-                    new BasicDBObject("Link",temp.getLinkURL()).append
-                                      ("Source", temp.getPointingLinks())
+                    new BasicDBObject("Link",temp.getLinkURL())
+                    				   .append("Source", temp.getPointingLinks())
                                       .append("Number Of Links", temp.getNumberOfURLs())
                                       .append("Visited", temp.isVisited())
                                       .append("CrawledIndex", i)
                                        , true
                                        , false);
-           
+
         }
     }
     public void saveSeeds(ArrayList<SeedsObject> seeds) {
     	DBCollection collection = database.getCollection("SeedsTable");
     	for (int i =0;i<seeds.size();i++) {
-    	      
+
         	SeedsObject temp = seeds.get(i);
 
             collection.update(new BasicDBObject("Link", temp.getLink()),
@@ -91,57 +79,77 @@ public class DbManager {
                                       .append("Content", temp.getBody())
                                        , true
                                        , false);
-           
+
         }
-    	
+
     }
-    
+
     public DBCursor getSeeds(){
     	DBCollection collection = database.getCollection("SeedsTable");
-    	DBCursor cursor = collection.find();
-    	
-    	return cursor;
-    	
-    	
+
+        return collection.find();
+
+
     }
     public DBCursor getCrawledLinks(){
     	DBCollection collection = database.getCollection("CrawlerTable");
-    	DBCursor cursor = collection.find();
-    	
-    	return cursor;
-    	
-    	
+
+        return collection.find();
+
     }
     public DBCursor getRobots(){
     	DBCollection collection = database.getCollection("Robot");
-    	DBCursor cursor = collection.find();
-    	
-    	return cursor;
-    	
-    	
+
+        return collection.find();
+
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     
-    public void saveDocumentCollection( Map<termDocumentKey, List<Integer>> terms){
-        DBCollection collection = database.getCollection("Document");
+    public void saveTermCollection( Map<String , Set<String>> terms){
+        DBCollection collection = database.getCollection("Term");
 
-        List<DBObject> entreis= new ArrayList<DBObject>();
+        for (Map.Entry<String,Set<String>> entry : terms.entrySet()) {
+
+            collection.update(new BasicDBObject("term", entry.getKey()),
+                    new BasicDBObject("$inc", new BasicDBObject("termDocumentsFreq", entry.getValue().size()))
+                                      .append("$push" , new BasicDBObject("documents", new BasicDBObject("$each", entry.getValue())))
+                                       , true
+                                       , false);
+        }
+    }
+    public void saveDocumentCollection( Map<termDocumentKey, List<Integer>> terms, Map<String, Integer> documentsSizes){
+        DBCollection collection = database.getCollection("Document");
+        int indexIterator = 0;
+        List<DBObject> entries= new ArrayList<DBObject>();
         for (Map.Entry<termDocumentKey, List<Integer>>  termDocument : terms.entrySet()) {
             DBObject entry = new BasicDBObject()
                     .append("term", termDocument.getKey().term)
-                    .append("document", termDocument.getKey().docID)
-                    .append("termDocumentFrequency", termDocument.getValue().size())
-                    .append("positions" , termDocument.getValue())    ;
+                    .append("document", termDocument.getKey().docUrl)
+                    .append("termFrequency", termDocument.getValue().size()/(float)documentsSizes.get(termDocument.getKey().docUrl))
+                    .append("positions" , termDocument.getValue());
 
-            entreis.add(entry);
-            /*
-            collection.update(new BasicDBObject("term", termDocument.getKey().term)
-                                                .append("document",termDocument.getKey().docID)
-                    , entry
-                    , true
-                    , false);
-            */
+            entries.add(entry);
         }
-        collection.insert(entreis);
+        collection.insert(entries);
+    }
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    public void savePageRank(Map<String, Double> pageRank) {
+        DBCollection collection = database.getCollection("PopularityTable");
+
+        List<DBObject> entries= new ArrayList<DBObject>();
+        for(Map.Entry<String, Double> link : pageRank.entrySet()){
+            DBObject entry = new BasicDBObject()
+                    .append("link", link.getKey())
+                    .append("popularity", link.getValue());
+            entries.add(entry);
+        }
+        collection.insert(entries);
+    }
+    public DBCursor getPageRank(){
+        DBCollection collection = database.getCollection("PopularityTable");
+
+        return collection.find();
+
     }
 }
