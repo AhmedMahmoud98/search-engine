@@ -98,25 +98,22 @@ public class DbManager {
 
     public DBCursor getSeeds(){
     	DBCollection collection = database.getCollection("SeedsTable");
-    	DBCursor cursor = collection.find();
 
-    	return cursor;
+        return collection.find();
 
 
     }
     public DBCursor getCrawledLinks(){
     	DBCollection collection = database.getCollection("CrawlerTable");
-    	DBCursor cursor = collection.find();
 
-    	return cursor;
+        return collection.find();
 
 
     }
     public DBCursor getRobots(){
     	DBCollection collection = database.getCollection("Robot");
-    	DBCursor cursor = collection.find();
 
-    	return cursor;
+        return collection.find();
 
 
     }
