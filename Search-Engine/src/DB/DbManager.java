@@ -7,10 +7,8 @@ import Crawler.CrawlerObject;
 import Crawler.SeedsObject;
 import Indexer.termDocumentKey;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+
 import org.bson.Document;
 
 /* Singleton Pattern */
@@ -132,6 +130,24 @@ public class DbManager {
         }
         collection.insert(entries);
     }
+
+    public void saveImageCollection(Map<String,List<String>> terms, String url){
+        DBCollection collection = database.getCollection("Images");
+        for (Map.Entry<String,List<String>> entry : terms.entrySet()) {
+
+            if (entry.getValue().get(0) instanceof String) {
+                System.out.println(entry.getValue());
+            }
+            collection.update(new BasicDBObject("term", entry.getKey()),
+                    new BasicDBObject("$push", new BasicDBObject("imageUrl", new BasicDBObject("$each", entry.getValue())))
+                            .append("$push" , new BasicDBObject("websiteUrl", url))
+                            .append("$push", new BasicDBObject("imageUrl", new BasicDBObject("$each", entry.getValue())))
+                    , true
+                    , false);
+        }
+    }
+
+
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     public void savePageRank(Map<String, Double> pageRank) {
