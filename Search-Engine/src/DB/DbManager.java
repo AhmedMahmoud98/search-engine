@@ -105,6 +105,7 @@ public class DbManager {
     
     public void saveTermCollection( Map<String , Set<String>> terms){
         DBCollection collection = database.getCollection("Term");
+        collection.drop();
 
         for (Map.Entry<String,Set<String>> entry : terms.entrySet()) {
 
@@ -117,6 +118,8 @@ public class DbManager {
     }
     public void saveDocumentCollection( Map<termDocumentKey, List<Integer>> terms, Map<String, Integer> documentsSizes){
         DBCollection collection = database.getCollection("Document");
+        collection.drop();
+
         int indexIterator = 0;
         List<DBObject> entries= new ArrayList<DBObject>();
         for (Map.Entry<termDocumentKey, List<Integer>>  termDocument : terms.entrySet()) {

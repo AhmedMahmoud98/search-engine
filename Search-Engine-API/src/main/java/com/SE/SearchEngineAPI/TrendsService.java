@@ -20,7 +20,7 @@ import org.springframework.stereotype.Service;
 
 import opennlp.tools.namefind.NameFinderME;
 import opennlp.tools.namefind.TokenNameFinderModel;
-import opennlp.tools.util.Span; 
+import opennlp.tools.util.Span;
 import Models.Trend;
 import Models.CustomQuery;
 

@@ -14,7 +14,7 @@ public class Test {
     public static void main(String[] args) throws IOException, InterruptedException{
 
         /* Remove Mongo Logging */
-        Logger mongoLogger = Logger.getLogger( "org.mongodb.driver" );
+        Logger mongoLogger = Logger.getLogger("org.mongodb.driver");
         mongoLogger.setLevel(Level.SEVERE); // e.g. or Log.WARNING, etc.
         
         //Map<Integer, String> URLs = new LinkedHashMap<Integer, String>();
