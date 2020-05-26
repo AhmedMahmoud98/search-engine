@@ -1,25 +1,33 @@
 package DB;
+import org.bson.Document;
 import com.mongodb.*;
-import com.mongodb.client.MongoCursor;
-import com.mongodb.client.model.Filters;
+import com.mongodb.client.*;
+import com.mongodb.client.model.Projections;
+import static com.mongodb.client.model.Filters.*;
+import static com.mongodb.client.model.Updates.*;
+import com.mongodb.MongoClient;
+import com.mongodb.MongoClientURI;
+import com.mongodb.ServerAddress;
 
 import Crawler.CrawlerObject;
 import Crawler.SeedsObject;
 import Indexer.termDocumentKey;
 
+import com.mongodb.Block;
+
 import java.util.*;
 
-import org.bson.Document;
 
 /* Singleton Pattern */
 public class DbManager {
+	private MongoClient mongoClient;
     private DB database;
     private static DbManager instance;
     
     public DbManager(){
     	
         /* Initialize default connection */
-        MongoClient mongoClient = new MongoClient();
+        mongoClient = new MongoClient();
         database = mongoClient.getDB("SearchEngine");
     }
 
@@ -95,6 +103,20 @@ public class DbManager {
         return collection.find();
 
     }
+    
+    public List<String> getCrawledUrls(int StartingIndex) {
+    	MongoDatabase SearchEngine = mongoClient.getDatabase("SearchEngine");
+        MongoCollection<Document> collection = SearchEngine.getCollection("CrawlerTable");
+    	Iterator<Document>  objects = collection.find(and(gt("CrawledIndex", StartingIndex*1000), lt("CrawledIndex", (StartingIndex+1)*1000)))
+    											.projection(Projections.include("Link")).iterator(); 
+    	List<String> Urls = new ArrayList<String>();
+    	while (objects.hasNext()) {
+    		String Url = (String) new ArrayList<>(objects.next().values()).get(1);
+    		Urls.add(Url);
+    	}
+    	return Urls;
+    }
+    
     public DBCursor getRobots(){
     	DBCollection collection = database.getCollection("Robot");
 
@@ -105,7 +127,6 @@ public class DbManager {
     
     public void saveTermCollection( Map<String , Set<String>> terms){
         DBCollection collection = database.getCollection("Term");
-        collection.drop();
 
         for (Map.Entry<String,Set<String>> entry : terms.entrySet()) {
 
@@ -118,9 +139,7 @@ public class DbManager {
     }
     public void saveDocumentCollection( Map<termDocumentKey, List<Integer>> terms, Map<String, Integer> documentsSizes){
         DBCollection collection = database.getCollection("Document");
-        collection.drop();
 
-        int indexIterator = 0;
         List<DBObject> entries= new ArrayList<DBObject>();
         for (Map.Entry<termDocumentKey, List<Integer>>  termDocument : terms.entrySet()) {
             DBObject entry = new BasicDBObject()
@@ -138,9 +157,6 @@ public class DbManager {
         DBCollection collection = database.getCollection("Images");
         for (Map.Entry<String,List<String>> entry : terms.entrySet()) {
 
-            if (entry.getValue().get(0) instanceof String) {
-                System.out.println(entry.getValue());
-            }
             collection.update(new BasicDBObject("term", entry.getKey()),
                     new BasicDBObject("$push", new BasicDBObject("imageUrl", new BasicDBObject("$each", entry.getValue())))
                             .append("$push" , new BasicDBObject("websiteUrl", url))

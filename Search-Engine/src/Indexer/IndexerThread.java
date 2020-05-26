@@ -1,4 +1,5 @@
 package Indexer;
+import java.net.URL;
 import java.util.*;
 
 import DB.DbManager;
@@ -14,12 +15,12 @@ public class IndexerThread implements Runnable {
 	private Map <termDocumentKey, List<Integer>> termDocumentDictionary;
 	
 	/* The Documents that this Thread should Process */
-	private Map.Entry<Integer, String>[] documentsURLs;
+	private List<String> documentsURLs;
 	private int docStartIndex;
 	private int docEndIndex;
 
 	/* Constructor */
-	public IndexerThread(Map.Entry<Integer, String>[] docsURLs, int docStIdx, int docEndIdx ){
+	public IndexerThread(List<String> docsURLs, int docStIdx, int docEndIdx ){
 
 		this.docStartIndex = docStIdx;
 		this.docEndIndex = docEndIdx;
@@ -47,8 +48,7 @@ public class IndexerThread implements Runnable {
 		
 		/* Store Number of words at each Document */
 		Map<String, Integer> documentsSizes = new LinkedHashMap<String, Integer>();
-		int documentsIterator = 0;
-		
+
 		/* Iterate Through Portion of The Documents that Assigned to that Thread */
 		for(int i = docStartIndex ;i < docEndIndex; i++) 
 		{
@@ -67,58 +67,58 @@ public class IndexerThread implements Runnable {
 			}
 			
 			/* The Processed Document ID with URL */
-			Map.Entry<Integer, String> documentURL = documentsURLs[i];
-			tempURL = documentURL.getValue().replaceAll("[\uFEFF-\uFFFF]", "");
-			/* Invoke HTMLDocument constrictor to tokenize html  */
-			document = new HTMLDocument(tempURL);
-			
-			/* The Processed Document ID with Its Terms */
-			List<String> terms = document.getTerms();
-			
-			/* Save The document Number of Words to Calculate the term frequency */
-			documentsSizes.put(tempURL, document.getTerms().size());
-
-			/* Variable Used To Track Each Term Position in the Document */
-			int termPosition = 0;
-			
-			/* Loop Through All Terms in The File */
-			for (String term : terms) 
-			{
-				Set<String> termDocumentsUrls = null;
-				/* Check If This Term is already appeared in other Document */
-				if (termDictionary.get(term) == null) 
-				{
-					/* Make a New List For This Term */
-					termDocumentsUrls = new HashSet<String>();
-					termDictionary.put(term, termDocumentsUrls);
-				}
-				else 
-					/* Get This Term List */
-					termDocumentsUrls = termDictionary.get(term);
+			String documentURL = documentsURLs.get(i);
+			tempURL = documentURL.replaceAll("[\uFEFF-\uFFFF]", "");
+			if(this.isValid(tempURL)) {
+				/* Invoke HTMLDocument constrictor to tokenize html  */
+				document = new HTMLDocument(tempURL);
 				
-				/* Add This Document To the Term List */ 
-				termDocumentsUrls.add(tempURL);
-				List<Integer> termDocumentPositions= null;
-				termDocumentKey Key = new termDocumentKey(term, tempURL);
-				/* Check If This Terms is already appeared in This Document */
-				if (termDocumentDictionary.get(Key) == null)
+				/* The Processed Document ID with Its Terms */
+				List<String> terms = document.getTerms();
+				
+				/* Save The document Number of Words to Calculate the term frequency */
+				documentsSizes.put(tempURL, document.getTerms().size());
+	
+				/* Variable Used To Track Each Term Position in the Document */
+				int termPosition = 0;
+				
+				/* Loop Through All Terms in The File */
+				for (String term : terms) 
 				{
-					/* Make a New List For This Term in That Document with Its Position */
-					termDocumentPositions = new ArrayList<Integer>();
-					termDocumentDictionary.put(Key, termDocumentPositions);
+					Set<String> termDocumentsUrls = null;
+					/* Check If This Term is already appeared in other Document */
+					if (termDictionary.get(term) == null) 
+					{
+						/* Make a New List For This Term */
+						termDocumentsUrls = new HashSet<String>();
+						termDictionary.put(term, termDocumentsUrls);
+					}
+					else 
+						/* Get This Term List */
+						termDocumentsUrls = termDictionary.get(term);
 					
+					/* Add This Document To the Term List */ 
+					termDocumentsUrls.add(tempURL);
+					List<Integer> termDocumentPositions= null;
+					termDocumentKey Key = new termDocumentKey(term, tempURL);
+					/* Check If This Terms is already appeared in This Document */
+					if (termDocumentDictionary.get(Key) == null)
+					{
+						/* Make a New List For This Term in That Document with Its Position */
+						termDocumentPositions = new ArrayList<Integer>();
+						termDocumentDictionary.put(Key, termDocumentPositions);					
+					}
+					else
+						/* Get This Term Positions List */
+						termDocumentPositions = termDocumentDictionary.get(Key);
+					
+					/* Add This Position To the Document Term List */ 
+					termDocumentPositions.add(termPosition);
+					
+					/* Go To The Next Position */
+					termPosition++;
 				}
-				else
-					/* Get This Term Positions List */
-					termDocumentPositions = termDocumentDictionary.get(Key);
-				
-				/* Add This Position To the Document Term List */ 
-				termDocumentPositions.add(termPosition);
-				
-				/* Go To The Next Position */
-				termPosition++;
 			}
-			documentsIterator++;
 		}
 		/* Write The Inverted File to the DB, Remove It from Memory then Continue To Process Documents */
 		StoreDictonaries(documentsSizes);
@@ -132,7 +132,21 @@ public class IndexerThread implements Runnable {
 		DBManager.saveTermCollection(termDictionary);
 		DBManager.saveDocumentCollection(termDocumentDictionary, documentsSizes);
 	}
+	
+    public static boolean isValid(String url) 
+    { 
+        try { 
+            new URL(url).toURI(); 
+            return true; 
+        } 
+          
+        catch (Exception e) { 
+            return false; 
+        } 
+    } 
 }
+
+
 	
 	
 	

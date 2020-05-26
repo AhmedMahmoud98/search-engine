@@ -20,6 +20,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import DB.*;
 
@@ -27,14 +28,24 @@ import DB.*;
 
 //mongod --dbpath /var/lib/mongo --logpath /var/log/mongodb/mongod.log --fork
 
-public class CrawlerController {
+public class CrawlerController implements Runnable {
 	public static Map<String, ArrayList<String>> ROBOTS_DISALLOWED;
 	public static int NUMBER_OF_WEBSITES;
 	public static ArrayList<CrawlerObject> LINKS;
 	public static ArrayList<SeedsObject> SEEDS;
-	public static  ArrayList<String> INITIAL_SEEDS;
+	public static ArrayList<String> INITIAL_SEEDS;
+	public static int NUMBER_OF_THREADS;
+	/* synchronization with Indexer */
+	public static AtomicInteger SYNCHRONIZATION;   
+	public static int NUM_OF_K_DOCUMENTS = 0;
+	
+	public CrawlerController(int _numOfThreads, int numOfUrls, AtomicInteger synchronization){
+		this.NUMBER_OF_WEBSITES = numOfUrls;
+		this.NUMBER_OF_THREADS = _numOfThreads;
+		this.SYNCHRONIZATION = synchronization;
+	}
 
-	public static void main(String[] args) throws InterruptedException {
+	public void Crawl() throws InterruptedException {
 		// Creating The Links Container and The Websites That is Disallowed To join
 		SEEDS = new ArrayList<SeedsObject>();
 		ROBOTS_DISALLOWED = new HashMap<String, ArrayList<String>>();
@@ -75,14 +86,13 @@ public class CrawlerController {
 		// database is empty
 
 		// Starting The Threads To Start Crawling
-		int numberOfThreads = 5;
-		NUMBER_OF_WEBSITES = 1200;
+		int NUMBER_OF_THREADS = 5;
 
 		ArrayList<Thread> threads = new ArrayList<Thread>();
 
 		while (LINKS.size() < NUMBER_OF_WEBSITES) {
 			threads.clear();
-			for (int j = 0; j < numberOfThreads; j++) {
+			for (int j = 0; j < NUMBER_OF_THREADS; j++) {
 				if (currentIndex < LINKS.size()) {
 					CrawlerObject current = LINKS.get(currentIndex);
 					Crawler c = new Crawler(current, LINKS, j);
@@ -91,23 +101,29 @@ public class CrawlerController {
 					threads.add(t);
 					t.start();
 					currentIndex++;
-
+					
 				}
 
 			}
 
 			for (int i = 0; i < threads.size(); i++) {
 				threads.get(i).join();
-
 			}
+			
 			if (threads.size() == 0) {
 				break;
 			}
 		}
+		
+		synchronized (CrawlerController.SYNCHRONIZATION) {
+			CrawlerController.SaveLinks();
+			CrawlerController.SaveRobots();
+			CrawlerController.NUM_OF_K_DOCUMENTS = 0;
+			CrawlerController.SYNCHRONIZATION.incrementAndGet();
+			CrawlerController.SYNCHRONIZATION.notifyAll();
+		}
+		
 
-			// Save your Output To DataBase
-			SaveRobots();
-			SaveLinks();
 			// ReCrawlling and ReCrawlling Conditions and Time To Check ReCrawlling
 			boolean recrawl = false;
 			//ReCrawling Condition if any document of the seeds Changed
@@ -124,6 +140,7 @@ public class CrawlerController {
 					
 				}
 			}
+			
 			//ReCrawling
 			if(recrawl) {
 				System.out.println("Needs To Recrawl");
@@ -137,10 +154,11 @@ public class CrawlerController {
 						LINKS.add(c);
 					}
 				}
+				
 				System.out.println(LINKS.size());
 				while (LINKS.size() < NUMBER_OF_WEBSITES) {
 					threads.clear();
-					for (int j = 0; j < numberOfThreads; j++) {
+					for (int j = 0; j < NUMBER_OF_THREADS; j++) {
 						if (currentIndex < LINKS.size()) {
 							CrawlerObject current = LINKS.get(currentIndex);
 							Crawler c = new Crawler(current, LINKS, j);
@@ -236,9 +254,9 @@ public class CrawlerController {
 			boolean Visited = (boolean) crawledFromDB.get("Visited");
 			CrawlerObject c = new CrawlerObject(linkName, sourceLinks, numberOfLinks, Visited);
 			LINKS.add(c);
-
 		}
 	}
+	
 	public static void GetSeeds() {
 		DbManager DBManger = DbManager.getInstance();
 		DBCollection SeedsDB = DBManger.getSeeds().getCollection();
@@ -251,6 +269,16 @@ public class CrawlerController {
 
 			SEEDS.add(new SeedsObject(linkName,content));
 		}
+	}
+	
+	@Override
+	public void run() {
+		try {
+			this.Crawl();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		
 	}
 }
 
@@ -309,10 +337,6 @@ class Crawler implements Runnable {
 		try {
 			document = Jsoup.connect(URL).get();
 			
-			
-			
-			
-
 			Elements linksOnPage = document.select("a[href]");
 			mCrawlerObj.setNumberOfURLs(linksOnPage.size());
 			
@@ -326,10 +350,19 @@ class Crawler implements Runnable {
 						CrawlerObject toBeAdded = new CrawlerObject();
 						toBeAdded.setLinkURL(page.attr("abs:href"));
 						links.add(toBeAdded);
+						CrawlerController.NUM_OF_K_DOCUMENTS = CrawlerController.NUM_OF_K_DOCUMENTS + 1;
 
+						synchronized (CrawlerController.SYNCHRONIZATION) {
+							if(CrawlerController.NUM_OF_K_DOCUMENTS >= 1000) {
+								CrawlerController.SaveLinks();
+								CrawlerController.SaveRobots();
+								CrawlerController.NUM_OF_K_DOCUMENTS = 0;
+								CrawlerController.SYNCHRONIZATION.incrementAndGet();
+								CrawlerController.SYNCHRONIZATION.notifyAll();
+							}
+						}
 					}
 				}
-
 			}
 
 		} catch (IOException e) {
