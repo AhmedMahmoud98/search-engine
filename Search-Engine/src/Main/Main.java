@@ -13,7 +13,7 @@ import Ranker.PageRank;
 
 import java.util.logging.Level;
 
-public class Test {
+public class Main {
 
     public static void main(String[] args) throws IOException, InterruptedException{
 
