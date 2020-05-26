@@ -7,6 +7,7 @@ import static org.springframework.data.mongodb.core.query.Query.query;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,8 @@ import opennlp.tools.namefind.TokenNameFinderModel;
 import opennlp.tools.util.Span; 
 import Models.Trend;
 import Models.CustomQuery;
+import Models.Document_;
+import Models.Term;
 
 @Service
 public class TrendsService {

@@ -43,6 +43,7 @@ public class IndexerThread implements Runnable {
 		/* Calculate The Free Memory before start Processing */ 
 		int FreeMemory = (int) java.lang.Runtime.getRuntime().freeMemory();
 		int consumedMemory =  0;
+		String tempURL = null;
 		
 		/* Store Number of words at each Document */
 		Map<String, Integer> documentsSizes = new LinkedHashMap<String, Integer>();
@@ -67,15 +68,15 @@ public class IndexerThread implements Runnable {
 			
 			/* The Processed Document ID with URL */
 			Map.Entry<Integer, String> documentURL = documentsURLs[i];
-			
+			tempURL = documentURL.getValue().replaceAll("[\uFEFF-\uFFFF]", "");
 			/* Invoke HTMLDocument constrictor to tokenize html  */
-			document = new HTMLDocument(documentURL.getValue());
+			document = new HTMLDocument(tempURL);
 			
 			/* The Processed Document ID with Its Terms */
 			List<String> terms = document.getTerms();
 			
 			/* Save The document Number of Words to Calculate the term frequency */
-			documentsSizes.put(documentURL.getValue(), document.getTerms().size());
+			documentsSizes.put(tempURL, document.getTerms().size());
 
 			/* Variable Used To Track Each Term Position in the Document */
 			int termPosition = 0;
@@ -96,9 +97,9 @@ public class IndexerThread implements Runnable {
 					termDocumentsUrls = termDictionary.get(term);
 				
 				/* Add This Document To the Term List */ 
-				termDocumentsUrls.add(documentURL.getValue());
+				termDocumentsUrls.add(tempURL);
 				List<Integer> termDocumentPositions= null;
-				termDocumentKey Key = new termDocumentKey(term, documentURL.getValue());
+				termDocumentKey Key = new termDocumentKey(term, tempURL);
 				/* Check If This Terms is already appeared in This Document */
 				if (termDocumentDictionary.get(Key) == null)
 				{
