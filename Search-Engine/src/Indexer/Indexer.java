@@ -20,7 +20,7 @@ public class Indexer {
     public void getDocumentsURLs() throws IOException {
         /* TODO : GET Documents URLS From DB */
     	
-    	File file = new File("../urls.txt");   
+    	File file = new File("./assets/urls.txt");   
     	Scanner sc = new Scanner(file , "UTF-8");     //file to be scanned
     	int temp = 0;  
     	
@@ -29,6 +29,7 @@ public class Indexer {
     		documentsURLs.put(temp, sc.nextLine());
     		temp++;
     	}
+    	System.out.println(temp);
     }
 
     public void constructIndex() throws InterruptedException, IOException {
