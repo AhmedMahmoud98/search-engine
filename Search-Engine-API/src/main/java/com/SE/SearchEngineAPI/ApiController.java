@@ -29,7 +29,7 @@ public class ApiController {
 		  									  @RequestParam String country,
 		  									  @RequestParam String pageNumber) {
 	  try {
-		  	CustomQuery _query = new CustomQuery(query, country, Integer.valueOf(pageNumber));
+		  	CustomQuery _query = new CustomQuery(query, country, Integer.parseInt(pageNumber));
 		    trendsService.extractTrends(_query);
 		    suggestionsService.saveSuggestion(query);
 		    List<Page> Pages = new ArrayList<Page>();

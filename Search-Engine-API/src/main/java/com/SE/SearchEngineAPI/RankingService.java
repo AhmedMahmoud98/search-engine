@@ -52,10 +52,8 @@ public class RankingService {
 
     public List<Popularity> getPopularity() {
         Query query = new Query();
-        Criteria c = new Criteria().where("link").is("https://www.geeksforgeeks.org/php/");
         query.with(Sort.by(Sort.Direction.DESC, "popularity"))
-                .addCriteria(c)
-                .limit(7);
+                .limit(70);
 
         return this.mongoOperations.find(query, Popularity.class);
     }
