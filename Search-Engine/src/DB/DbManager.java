@@ -143,6 +143,7 @@ public class DbManager {
 
     public void savePageRank(Map<String, Double> pageRank) {
         DBCollection collection = database.getCollection("PopularityTable");
+        collection.drop();
 
         List<DBObject> entries= new ArrayList<DBObject>();
         for(Map.Entry<String, Double> link : pageRank.entrySet()){
