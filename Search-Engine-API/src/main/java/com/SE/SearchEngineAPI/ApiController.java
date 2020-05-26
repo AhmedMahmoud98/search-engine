@@ -2,12 +2,12 @@ package com.SE.SearchEngineAPI;
 import java.util.*;
 
 import Models.*;
+import Queries.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 @CrossOrigin(origins = "http://localhost:4200")
 @RestController
 @RequestMapping("/api")
@@ -21,7 +21,8 @@ public class ApiController {
   private TrendsService trendsService;
   @Autowired
   private SuggestionsService suggestionsService;
- 
+ @Autowired
+  private RankingService rankingService;
  
   @GetMapping("/Pages")
   public ResponseEntity<List<Page>> getPages (@RequestParam String query,
@@ -32,10 +33,13 @@ public class ApiController {
 		    trendsService.extractTrends(_query);
 		    suggestionsService.saveSuggestion(query);
 		    List<Page> Pages = new ArrayList<Page>();
-		    /** 
-		     * Run Query Processor and Ranker Here
-		     *  then return array of Pages 
-		     */
+
+		    QueryProcessor.setQuery(_query.getQueryString());
+		    ArrayList<String> processed = QueryProcessor.process();
+			ArrayList<String> top7 = rankingService.rank(_query);
+			for (int i=0; i<top7.size(); i++){
+				Pages.add(new Page("TITLE", top7.get(i), "SUMMARY"));
+			}
 
 		    if (Pages.isEmpty()) {
 		      return new ResponseEntity<>(HttpStatus.NO_CONTENT);
