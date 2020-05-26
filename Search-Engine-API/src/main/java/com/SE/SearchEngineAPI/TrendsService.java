@@ -10,6 +10,7 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
 
+import Models.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoOperations;
@@ -21,11 +22,7 @@ import org.springframework.stereotype.Service;
 
 import opennlp.tools.namefind.NameFinderME;
 import opennlp.tools.namefind.TokenNameFinderModel;
-import opennlp.tools.util.Span; 
-import Models.Trend;
-import Models.CustomQuery;
-import Models.Document_;
-import Models.Term;
+import opennlp.tools.util.Span;
 
 @Service
 public class TrendsService {

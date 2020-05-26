@@ -43,6 +43,7 @@ public class RankingService {
     public ArrayList<String> rank(CustomQuery _query) {
         ArrayList<String> ranked = new ArrayList<String>();
         List<Popularity> popularityScore = getPopularity();
+
         for (int i=0; i<popularityScore.size(); i++){
             ranked.add(popularityScore.get(i).getLink());
         }
@@ -52,7 +53,7 @@ public class RankingService {
     public List<Popularity> getPopularity() {
         Query query = new Query();
         query.with(Sort.by(Sort.Direction.DESC, "popularity"))
-                .limit(7);
+                .limit(70);
 
         return this.mongoOperations.find(query, Popularity.class);
     }

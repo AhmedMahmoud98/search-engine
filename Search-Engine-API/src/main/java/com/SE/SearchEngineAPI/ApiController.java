@@ -29,17 +29,18 @@ public class ApiController {
 		  									  @RequestParam String country,
 		  									  @RequestParam String pageNumber) {
 	  try {
-		  	CustomQuery _query = new CustomQuery(query, country, Integer.valueOf(pageNumber));
+		  	CustomQuery _query = new CustomQuery(query, country, Integer.parseInt(pageNumber));
 		    trendsService.extractTrends(_query);
 		    suggestionsService.saveSuggestion(query);
 		    List<Page> Pages = new ArrayList<Page>();
 
 		    QueryProcessor.setQuery(_query.getQueryString());
 		    ArrayList<String> processed = QueryProcessor.process();
-			ArrayList<String> top7 = rankingService.rank(_query);
-			for (int i=0; i<top7.size(); i++){
-				Pages.add(new Page("TITLE", top7.get(i), "SUMMARY"));
-			}
+			ArrayList<String> sortedLinks = rankingService.rank(_query);
+
+		  	for (String s : sortedLinks) {
+			  Pages.add(new Page("TITLE", s, "SUMMARY"));
+		  	}
 
 		    if (Pages.isEmpty()) {
 		      return new ResponseEntity<>(HttpStatus.NO_CONTENT);
