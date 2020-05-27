@@ -1,6 +1,7 @@
 package Indexer;
 import DB.DbManager;
 import org.jsoup.Jsoup;
+import org.jsoup.UnsupportedMimeTypeException;
 import org.jsoup.nodes.Document;
 
 import TextProcessing.Stemmer;
@@ -8,6 +9,7 @@ import TextProcessing.StopWords;
 import org.jsoup.nodes.Element;
 
 import java.io.IOException;
+import java.net.URL;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -23,15 +25,19 @@ public class HTMLDocument {
 		try {
 			String sanitized = docIP.replaceAll("[\uFEFF-\uFFFF]", "");
 			url = sanitized;
-			Document doc = Jsoup.connect(sanitized).get();
-			String docText = doc.text();
-			parseImages(doc);
-			setTerms(docText);
+			try {
+				Document doc = Jsoup.connect(sanitized).get();
+				String docText = doc.text();
+				parseImages(doc);
+				setTerms(docText);
+				
+			} catch (UnsupportedMimeTypeException e) {
+				System.out.println(url + " isn't a valid Url");				/* Not a valid Url */
+			}
+
 		} catch (IOException e) {
-			/* Website refuse to connect */
-			e.printStackTrace();
+			e.printStackTrace(); 
 		}
-		//this.terms = docIP.toString();
 	}
 
 	private void parseImages(Document doc){
@@ -130,7 +136,7 @@ public class HTMLDocument {
 		}
 		return ch;
 	}
-
+	
 	public List<String> getTerms() {
 		return terms;
 	}

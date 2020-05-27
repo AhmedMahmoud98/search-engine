@@ -6,17 +6,9 @@
 			<attribute name="module" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="/home/afifi/3rd Year/2021/2nd Term/Advanced Programming Techniques/project/search-engine/jsoup-1.13.1.jar">
-		<attributes>
-			<attribute name="module" value="true"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="/home/afifi/3rd Year/2021/2nd Term/Advanced Programming Techniques/project/search-engine/mongo-java-driver-3.12.3.jar">
-		<attributes>
-			<attribute name="module" value="true"/>
-		</attributes>
-	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/jsoup-1.13.1"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/mongo-java-driver-3.12.3"/>
+	<classpathentry kind="lib" path="/home/afifi/3rd Year/2021/2nd Term/Advanced Programming Techniques/project/search-engine/jsoup-1.13.1.jar"/>
+	<classpathentry kind="lib" path="/home/afifi/3rd Year/2021/2nd Term/Advanced Programming Techniques/project/search-engine/mongo-java-driver-3.12.3.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

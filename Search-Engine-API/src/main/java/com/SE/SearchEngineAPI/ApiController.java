@@ -14,15 +14,15 @@ import org.springframework.web.bind.annotation.*;
 public class ApiController {
 
   @Autowired
-  VisitedUrlsRepository visitedUrlsRepository;
-  @Autowired
   SuggestionsRepository suggestionsRepository;
   @Autowired
   private TrendsService trendsService;
   @Autowired
   private SuggestionsService suggestionsService;
- @Autowired
+  @Autowired
   private RankingService rankingService;
+  @Autowired
+  private VisitedUrlsService visitedUrlsService;
  
   @GetMapping("/Pages")
   public ResponseEntity<List<Page>> getPages (@RequestParam String query,
@@ -116,10 +116,11 @@ public class ApiController {
   }
 
   @PostMapping("/VisitedUrls")
-  public ResponseEntity<VisitedUrl> createTutorial(@RequestBody VisitedUrl visitedUrl) {
+  public ResponseEntity<VisitedUrl> createTutorial(@RequestParam String query,
+												   @RequestParam String visitedUrl) {
 	  try {
-		  VisitedUrl _visitedURL = visitedUrlsRepository.save(new VisitedUrl(visitedUrl.getId(), visitedUrl.getVisitedUrl()));
-		  return new ResponseEntity<>(_visitedURL, HttpStatus.CREATED);
+		  VisitedUrl _visitedUrl = visitedUrlsService.saveVisitedUrl(visitedUrl, query);
+		  return new ResponseEntity<>(_visitedUrl, HttpStatus.CREATED);
 		  } catch (Exception e) {
 		    return new ResponseEntity<>(null, HttpStatus.EXPECTATION_FAILED);
 		  }
