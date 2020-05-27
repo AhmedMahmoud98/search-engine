@@ -70,7 +70,7 @@ public class HTMLDocument {
 
 			// Split image Name into words and remove extansion
 			Set<String> Imageterms = new HashSet<String>(Arrays.asList(imageSrc.split("-|\\.|_")));
-			Imageterms.addAll(Arrays.asList(imageSrc.split("-|\\.|_")));
+			Imageterms.addAll(Arrays.asList(imageAlt.split("-|\\.|_")));
 			Iterator<String> it = Imageterms.iterator();
 			List<String> stopWords = StopWords.getStopWords();
 			Stemmer stemmer = new Stemmer();

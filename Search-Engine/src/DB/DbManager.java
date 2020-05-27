@@ -158,9 +158,8 @@ public class DbManager {
         for (Map.Entry<String,List<String>> entry : terms.entrySet()) {
 
             collection.update(new BasicDBObject("term", entry.getKey()),
-                    new BasicDBObject("$push", new BasicDBObject("imageUrl", new BasicDBObject("$each", entry.getValue())))
-                            .append("$push" , new BasicDBObject("websiteUrl", url))
-                            .append("$push", new BasicDBObject("imageUrl", new BasicDBObject("$each", entry.getValue())))
+                    new BasicDBObject("$push", new BasicDBObject("imageUrl", new BasicDBObject("$each", entry.getValue()))
+                            .append("websiteUrl", url))
                     , true
                     , false);
         }
