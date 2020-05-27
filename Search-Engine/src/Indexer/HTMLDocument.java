@@ -28,8 +28,9 @@ public class HTMLDocument {
 			try {
 				Document doc = Jsoup.connect(sanitized).get();
 				String docText = doc.text();
+				String title = doc.getElementsByTag("title").text();
 				parseImages(doc);
-				setTerms(docText);
+				setTerms(docText , title);
 				
 			} catch (UnsupportedMimeTypeException e) {
 				System.out.println(url + " isn't a valid Url");				/* Not a valid Url */
@@ -107,23 +108,40 @@ public class HTMLDocument {
 		dbManager.saveImageCollection(imageTerms , url);
 	}
 
-	private void setTerms(String text){
+	private void setTerms(String text , String title){
 		/* Remove any non alphanumeric charachter */
 		text = text.replaceAll("[^a-zA-Z0-9 ]", ""); // double quotes
 		text = text.toLowerCase();
+		title = title.replaceAll("[^a-zA-Z0-9 ]", "");
+		title = title.toLowerCase();
 		//System.out.println(text);
 		String[] temp = text.split("\\s+"); // any number of spaces
+		String[] temp2 = title.split("\\s+");
+
 		List<String> stopWords = StopWords.getStopWords();
+
 
 		/* Stem words */
 		Stemmer stemmer = new Stemmer();
+
+		/* Add title words first */
+		for (int j = 0 ; j <temp2.length; j++){
+			if(!stopWords.contains(temp2[j])) {
+				stemmer.add(stringToChar(temp[j]), temp[j].length());
+				stemmer.stem();
+				terms.add(stemmer.toString());
+			}
+		}
+		/* Add Stop word as border */
+		terms.add("me");
+
+		/* Add document coontent*/
 		for (int i = 0 ; i < temp.length ; i++) {
 			/* Remove stop words */
 			if(!stopWords.contains(temp[i])) {
 				stemmer.add(stringToChar(temp[i]), temp[i].length());
 				stemmer.stem();
 				terms.add(stemmer.toString());
-				// stemmer.reset();
 			}
 		}
 		//System.out.println(terms);

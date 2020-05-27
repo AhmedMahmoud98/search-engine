@@ -141,13 +141,17 @@ public class DbManager {
         DBCollection collection = database.getCollection("Document");
 
         List<DBObject> entries= new ArrayList<DBObject>();
+        boolean inTtitle ;
         for (Map.Entry<termDocumentKey, List<Integer>>  termDocument : terms.entrySet()) {
+            if(termDocument.getValue().get(0) == -1) inTtitle = true;
+            else                                     inTtitle = false;
+
             DBObject entry = new BasicDBObject()
                     .append("term", termDocument.getKey().term)
                     .append("document", termDocument.getKey().docUrl)
                     .append("termFrequency", termDocument.getValue().size()/(float)documentsSizes.get(termDocument.getKey().docUrl))
-                    .append("positions" , termDocument.getValue());
-
+                    .append("positions" , termDocument.getValue())
+                    .append("inTitle" , inTtitle);
             entries.add(entry);
         }
         collection.insert(entries);

@@ -81,10 +81,15 @@ public class IndexerThread implements Runnable {
 	
 				/* Variable Used To Track Each Term Position in the Document */
 				int termPosition = 0;
-				
+
+				boolean flag = true;
 				/* Loop Through All Terms in The File */
 				for (String term : terms) 
 				{
+					if(term == "me"){
+						flag = false;
+						continue;
+					}
 					Set<String> termDocumentsUrls = null;
 					/* Check If This Term is already appeared in other Document */
 					if (termDictionary.get(term) == null) 
@@ -108,10 +113,13 @@ public class IndexerThread implements Runnable {
 						termDocumentPositions = new ArrayList<Integer>();
 						termDocumentDictionary.put(Key, termDocumentPositions);					
 					}
-					else
+					else {
 						/* Get This Term Positions List */
 						termDocumentPositions = termDocumentDictionary.get(Key);
-					
+					}
+					if(flag){
+						termDocumentPositions.add(0 , -1);
+					}
 					/* Add This Position To the Document Term List */ 
 					termDocumentPositions.add(termPosition);
 					
