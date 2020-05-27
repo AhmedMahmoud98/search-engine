@@ -71,8 +71,7 @@ public class ApiController {
 	  try {
 		    CustomQuery _query = new CustomQuery(query, country, Integer.valueOf(pageNumber));
 		    List<Image> Images = new ArrayList<Image>();
-		    System.out.println(query);
-		    phraseService.phraseQuery(query);
+
 		    /** 
 		     * Run Query Processor and Ranker Here
 		     *  then return array of Images 
