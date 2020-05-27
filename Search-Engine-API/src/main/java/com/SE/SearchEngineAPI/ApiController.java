@@ -23,6 +23,8 @@ public class ApiController {
   private RankingService rankingService;
   @Autowired
   private VisitedUrlsService visitedUrlsService;
+  @Autowired
+  private PhraseService phraseService;
  
   @GetMapping("/Pages")
   public ResponseEntity<List<Page>> getPages (@RequestParam String query,
@@ -69,6 +71,8 @@ public class ApiController {
 	  try {
 		    CustomQuery _query = new CustomQuery(query, country, Integer.valueOf(pageNumber));
 		    List<Image> Images = new ArrayList<Image>();
+		    System.out.println(query);
+		    phraseService.phraseQuery(query);
 		    /** 
 		     * Run Query Processor and Ranker Here
 		     *  then return array of Images 

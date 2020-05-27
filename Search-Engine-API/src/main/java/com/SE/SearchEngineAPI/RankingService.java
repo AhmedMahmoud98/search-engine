@@ -53,7 +53,9 @@ public class RankingService {
         urls.add("https://www.geeksforgeeks.org/php/");
         urls.add("https://www.geeksforgeeks.org/category/algorithm/page/4/");
         List<Popularity> popularityScore = getPopularity(urls);
-        int docsCount = popularityScore.size();
+        
+        int docsCount = getNumberOfDocuments();
+        
         for (int i=0; i<processed.size(); i++){
             if (processed.get(i).split("\\s+").length > 1){
                 // Phrase
@@ -78,6 +80,10 @@ public class RankingService {
             ranked.add(popularityScore.get(i).getLink());
         }
         return ranked;
+    }
+    
+    public int getNumberOfDocuments() {
+        return this.mongoOperations.find(new Query(), Popularity.class).size();
     }
 
     public List<Popularity> getPopularity(List<String> urls) {
