@@ -34,8 +34,6 @@ public class ApiController {
 		    suggestionsService.saveSuggestion(query);
 		    List<Page> Pages = new ArrayList<Page>();
 
-		    QueryProcessor.setQuery(_query.getQueryString());
-		    ArrayList<String> processed = QueryProcessor.process();
 			ArrayList<String> sortedLinks = rankingService.rank(_query);
 
 		  	for (String s : sortedLinks) {
@@ -46,7 +44,18 @@ public class ApiController {
 		      return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 		    }
 
-		    return new ResponseEntity<>(Pages, HttpStatus.OK);
+		    int sizeOfPage = 10;
+			int fromIdx = (Integer.parseInt(pageNumber) - 1) * sizeOfPage;
+		    int toIdx = fromIdx;
+		    if (fromIdx < sortedLinks.size()){
+		    	if (toIdx + sizeOfPage < sortedLinks.size() ){
+		    		toIdx += sizeOfPage;
+				}
+		    	else{
+		    		toIdx += (sortedLinks.size() - toIdx)% sizeOfPage;
+				}
+			}
+		    return new ResponseEntity<>(Pages.subList(fromIdx, toIdx), HttpStatus.OK);
 		  } catch (Exception e) {
 			System.out.println(e);
 		    return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
