@@ -69,10 +69,6 @@ public class ApiController {
 	  try {
 		    CustomQuery _query = new CustomQuery(query, country, Integer.valueOf(pageNumber));
 		    List<Image> Images = new ArrayList<Image>();
-		    /** 
-		     * Run Query Processor and Ranker Here
-		     *  then return array of Images 
-		     */
 		    
 		    if (Images.isEmpty()) {
 		      return new ResponseEntity<>(HttpStatus.NO_CONTENT);
