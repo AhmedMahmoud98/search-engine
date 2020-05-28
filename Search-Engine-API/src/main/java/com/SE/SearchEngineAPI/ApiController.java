@@ -23,6 +23,8 @@ public class ApiController {
   private RankingService rankingService;
   @Autowired
   private VisitedUrlsService visitedUrlsService;
+  @Autowired
+  private PhraseService phraseService;
  
   @GetMapping("/Pages")
   public ResponseEntity<List<Page>> getPages (@RequestParam String query,
