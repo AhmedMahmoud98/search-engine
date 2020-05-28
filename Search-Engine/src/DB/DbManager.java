@@ -154,7 +154,13 @@ public class DbManager {
                     .append("inTitle" , inTtitle);
             entries.add(entry);
         }
-        collection.insert(entries);
+        
+        if(!entries.isEmpty())
+        {
+        	collection.insert(entries);
+        	System.out.println("one Time");
+        }
+        
     }
 
     public void saveImageCollection(Map<String,List<String>> terms, String url){

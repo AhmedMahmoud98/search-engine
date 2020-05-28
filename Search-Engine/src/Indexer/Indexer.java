@@ -13,7 +13,7 @@ import DB.DbManager;
 
 public class Indexer implements Runnable {
 
-    private final int DOCUMENTS_PER_THREAD = 200;
+    private final int NUMBER_OF_THREAD = 10;
     private List<String> documentsURLs;
 	/* synchronization with Crawler, It indicates number of k documents that don't indexed yet */
 	public AtomicInteger SYNCHRONIZATION;  
@@ -48,13 +48,12 @@ public class Indexer implements Runnable {
     			}
     		}
 	        getDocumentsURLs(Count);
-	        
-	        final int numOfThreads = (int) Math.ceil(documentsURLs.size() / (float)DOCUMENTS_PER_THREAD);
+	        final int DOCUMENTS_PER_THREAD = (int) Math.ceil(documentsURLs.size() / (float)NUMBER_OF_THREAD);
 	        long timeBefore = 0, timeAfter= 0, IndexingTime = 0;
 	        timeBefore = System.currentTimeMillis();
 	        
 	        List<Thread> threads = new ArrayList<Thread>();
-	        for (int i = 0; i < numOfThreads; i++) {
+	        for (int i = 0; i < NUMBER_OF_THREAD; i++) {
 	            final int startIndex = i * DOCUMENTS_PER_THREAD;
 	            final int endIndex = Math.min(documentsURLs.size(), (i + 1) * DOCUMENTS_PER_THREAD);
 	            Thread indx = new Thread(new IndexerThread(documentsURLs, startIndex, endIndex));
