@@ -37,11 +37,14 @@ public class Page {
 			secondParagraphFirstIndex = docText.indexOf(queryTerm1, firstParagraphLastIndex + 1);
 			secondParagraphLastIndex = docText.indexOf(" ", secondParagraphFirstIndex + 100);
 		}
-		
-		this.summary += docText.substring(secondParagraphFirstIndex, secondParagraphLastIndex) + ".";
+		if(secondParagraphFirstIndex != -1)
+			this.summary += docText.substring(secondParagraphFirstIndex, secondParagraphLastIndex) + ".";
 		
 		/* Make The Query String bold */
-		this.summary = this.summary.replace(queryTerm1, "<b>"+ queryTerm1+"</b>").replace(queryTerm2, "<b>"+ queryTerm2+"</b>");;
+		this.summary = this.summary.replace(queryTerm1, "<b>"+ queryTerm1+"</b>");
+		
+		if(secondParagraphFirstIndex != -1)
+			this.summary = this.summary.replace(queryTerm2, "<b>"+ queryTerm2+"</b>");
 	} catch (IOException e) {
 		e.printStackTrace();
 	}
