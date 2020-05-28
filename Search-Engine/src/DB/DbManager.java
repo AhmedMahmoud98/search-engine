@@ -156,10 +156,8 @@ public class DbManager {
         }
         
         if(!entries.isEmpty())
-        {
         	collection.insert(entries);
-        	System.out.println("one Time");
-        }
+        
         
     }
 
