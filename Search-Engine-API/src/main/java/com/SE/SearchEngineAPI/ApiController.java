@@ -37,9 +37,13 @@ public class ApiController {
 		    List<Page> Pages = new ArrayList<Page>();
 
 			ArrayList<String> sortedLinks = rankingService.rank(_query);
+			String[] q = _query.getQueryString().split("\\s+");
 
+			String q1 = q[0];
+			String q2 = "";
+			if (q.length > 1)	q2 = q[1];
 		  	for (String s : sortedLinks) {
-			  Pages.add(new Page("TITLE", s, "SUMMARY"));
+			  Pages.add(new Page(s, q1, q2));
 		  	}
 
 		    if (Pages.isEmpty()) {

@@ -18,7 +18,7 @@ public class Page {
 
   }
   
-  public Page(String _url, String queryTerm1, String queryTerm2, int Dummy) {
+  public Page(String _url, String queryTerm1, String queryTerm2) {
 	  this.url = _url;
 	try {
 		org.jsoup.nodes.Document doc = Jsoup.connect(this.url).get();
@@ -48,14 +48,6 @@ public class Page {
 	} catch (IOException e) {
 		e.printStackTrace();
 	}
-	  
-
-  }
-
-  public Page(String _title, String _url, String _summary) {
-    this.title = _title;
-    this.url = _url;
-    this.summary = _summary;
   }
 
   public String getTitle() {

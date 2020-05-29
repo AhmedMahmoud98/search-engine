@@ -8,6 +8,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
+import java.util.stream.IntStream;
 
 import Models.*;
 import Queries.QueryProcessor;
@@ -36,7 +37,6 @@ public class RankingService {
     }
 
     public ArrayList<String> rank(CustomQuery _query) {
-        Map<String, Double> finalRanked = new HashMap<>();
 
         QueryProcessor.setQuery(_query.getQueryString());
         ArrayList<String> processed = QueryProcessor.process();
@@ -45,9 +45,13 @@ public class RankingService {
         String[] docs;
         double tfidf;
 
-        List<String> urls = new ArrayList<String>();
+        Set<String> urls = new HashSet<>();
 
         ArrayList<Double> queryTFIDF = new ArrayList<>();
+        tfidf = 1.0 / processed.size();
+        for (int k=0; k < processed.size(); k++){
+            queryTFIDF.add(tfidf);
+        }
         Map<String, List<Double>> rankings = new HashMap<>();
         List<Double> temp;
         int docsCount = getNumberOfDocuments();
@@ -55,7 +59,6 @@ public class RankingService {
         String doc;
         for (int i=0; i<processed.size(); i++) {
             qWord = processed.get(i);
-            System.out.println(qWord);
             if (qWord.split("\\s+").length > 1){
                 // Phrase
             }
@@ -63,32 +66,55 @@ public class RankingService {
                 termDocs = getTerms(qWord);
                 if (! termDocs.isEmpty()) {
                     docs = termDocs.get(0).getDocuments();
+
                     for (int j=0; j<docs.length; j++){
                         doc = docs[j];
                         urls.add(doc);
-                        rankings.computeIfAbsent(doc, k -> new ArrayList<>(processed.size()));
-
+                        if (rankings.get(doc) == null){
+                            temp = new ArrayList<>(processed.size());
+                            for (int k=0; k<processed.size(); k++){
+                                temp.add(0.0);
+                            }
+                            rankings.put(doc, temp);
+                        }
                         docsPerTerm = getDocsPerTerm(termDocs.get(0).getTerm(), docs[j]);
-                        tfidf = docsPerTerm.get(j).getTermFrequency() * (Math.log((docsCount*1.0) / termDocs.get(0).getTermDocumentsFreq()) / Math.log(2));
+                        tfidf = docsPerTerm.get(0).getTermFrequency() * (Math.log((docsCount*1.0) / termDocs.get(0).getTermDocumentsFreq()) / Math.log(2));
                         temp = rankings.get(doc);
-                        temp.add(i, tfidf);
-                        rankings.put(doc, temp);
+                        temp.set(i, tfidf);
+
+                        rankings.replace(doc, temp);
                     }
                 }
-                else{
-                    // TERM is not in DataBase.
-                }
-
             }
         }
-        List<Popularity> popularityScore = getPopularity(urls);
-
-        /*
-        System.out.println(popularityScore);
-        for (int i=0; i<popularityScore.size(); i++){
-            finalRanked.put(popularityScore.get(i).getLink());
+        // TF-IDF Score
+        double value;
+        double avgSum = 0;
+        Map<String, Double> finalRanked = new HashMap<>();
+        for (String s: urls){
+            value = IntStream.range(0, processed.size()).mapToDouble(i -> queryTFIDF.get(i) * rankings.get(s).get(i)).sum();
+            avgSum += value;
+            finalRanked.put(s, value);
         }
-        */
+        avgSum /= urls.size();
+        System.out.println(avgSum);
+
+        // Popularity score
+        List<Popularity> popularityScore = getPopularity(new ArrayList<>(urls));
+
+        String link;
+        avgSum = 0;
+        double popScoreCoeff = 10;
+        for (Popularity popularity : popularityScore) {
+            link = popularity.getLink();
+            value = popularity.getPopularity();
+            avgSum += value;
+            finalRanked.replace(link, (popScoreCoeff * value) + finalRanked.get(link));
+        }
+        avgSum /= urls.size();
+        System.out.println(avgSum);
+
+        finalRanked = sortByValue((HashMap<String, Double>) finalRanked);
         return new ArrayList<String>(finalRanked.keySet());
     }
     
@@ -96,12 +122,26 @@ public class RankingService {
         return this.mongoOperations.find(new Query(), Popularity.class).size();
     }
 
+    public static HashMap<String, Double> sortByValue(HashMap<String, Double> hm)
+    {
+        List<Map.Entry<String, Double> > list =
+                new LinkedList<Map.Entry<String, Double> >(hm.entrySet());
+
+
+        list.sort(Map.Entry.comparingByValue());
+        Collections.reverse(list);
+        HashMap<String, Double> temp = new LinkedHashMap<String, Double>();
+        for (Map.Entry<String, Double> aa : list) {
+            temp.put(aa.getKey(), aa.getValue());
+        }
+        return temp;
+    }
+
     public List<Popularity> getPopularity(List<String> urls) {
         Query query = new Query();
         Criteria orCrit = new Criteria();
         List<Criteria> orExpr = new ArrayList<Criteria>();
         for (int i=0; i<urls.size(); i++){
-            System.out.println(urls.get(i));
             Criteria temp = new Criteria();
             temp.and("link").is(urls.get(i));
             orExpr.add(temp);
