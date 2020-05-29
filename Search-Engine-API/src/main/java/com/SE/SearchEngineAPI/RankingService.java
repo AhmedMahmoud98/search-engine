@@ -31,7 +31,7 @@ public class RankingService {
     private MongoOperations mongoOperations;
 
     @Autowired
-    public RankingService(MongoOperations mongoOperations) throws IOException {
+    public RankingService(MongoOperations mongoOperations){
         this.mongoOperations = mongoOperations;
 
     }
@@ -67,19 +67,19 @@ public class RankingService {
                 if (! termDocs.isEmpty()) {
                     docs = termDocs.get(0).getDocuments();
 
-                    for (int j=0; j<docs.length; j++){
-                        doc = docs[j];
+                    for (String s : docs) {
+                        doc = s;
                         urls.add(doc);
-                        if (rankings.get(doc) == null){
+                        if (rankings.get(doc) == null) {
                             temp = new ArrayList<>(processed.size());
-                            for (int k=0; k<processed.size(); k++){
+                            for (int k = 0; k < processed.size(); k++) {
                                 temp.add(0.0);
                             }
                             rankings.put(doc, temp);
                         }
-                        docsPerTerm = getDocsPerTerm(termDocs.get(0).getTerm(), docs[j]);
-                        tfidf = docsPerTerm.get(0).getTermFrequency() * (Math.log((docsCount*1.0) / termDocs.get(0).getTermDocumentsFreq()) / Math.log(2));
-                        tfidf += tfidf * (docsPerTerm.get(0).isInTitle()? 1 : 0);
+                        docsPerTerm = getDocsPerTerm(termDocs.get(0).getTerm(), s);
+                        tfidf = docsPerTerm.get(0).getTermFrequency() * (Math.log((docsCount * 1.0) / termDocs.get(0).getTermDocumentsFreq()) / Math.log(2));
+                        tfidf += tfidf * (docsPerTerm.get(0).isInTitle() ? 1 : 0);
 
                         temp = rankings.get(doc);
                         temp.set(i, tfidf);
@@ -92,7 +92,7 @@ public class RankingService {
         // TF-IDF Score
         double value;
         double avgSum = 0;
-        Map<String, Double> finalRanked = new HashMap<>();
+        HashMap<String, Double> finalRanked = new HashMap<>();
         for (String s: urls){
             value = IntStream.range(0, processed.size()).mapToDouble(i -> queryTFIDF.get(i) * rankings.get(s).get(i)).sum();
             avgSum += value;
@@ -117,8 +117,8 @@ public class RankingService {
         // avgSum /= urls.size();
         // System.out.println(avgSum);
 
-        finalRanked = sortByValue((HashMap<String, Double>) finalRanked);
-        return new ArrayList<String>(finalRanked.keySet());
+        finalRanked = sortByValue(finalRanked);
+        return new ArrayList<>(finalRanked.keySet());
     }
     
     public int getNumberOfDocuments() {
@@ -128,12 +128,12 @@ public class RankingService {
     public static HashMap<String, Double> sortByValue(HashMap<String, Double> hm)
     {
         List<Map.Entry<String, Double> > list =
-                new LinkedList<Map.Entry<String, Double> >(hm.entrySet());
+                new LinkedList<>(hm.entrySet());
 
 
         list.sort(Map.Entry.comparingByValue());
         Collections.reverse(list);
-        HashMap<String, Double> temp = new LinkedHashMap<String, Double>();
+        HashMap<String, Double> temp = new LinkedHashMap<>();
         for (Map.Entry<String, Double> aa : list) {
             temp.put(aa.getKey(), aa.getValue());
         }
@@ -143,10 +143,10 @@ public class RankingService {
     public List<Popularity> getPopularity(List<String> urls) {
         Query query = new Query();
         Criteria orCrit = new Criteria();
-        List<Criteria> orExpr = new ArrayList<Criteria>();
-        for (int i=0; i<urls.size(); i++){
+        List<Criteria> orExpr = new ArrayList<>();
+        for (String url : urls) {
             Criteria temp = new Criteria();
-            temp.and("link").is(urls.get(i));
+            temp.and("link").is(url);
             orExpr.add(temp);
         }
 
@@ -155,6 +155,7 @@ public class RankingService {
         //System.out.println(this.mongoOperations.find(query, "PopularityTable"));
         return this.mongoOperations.find(query, Popularity.class);
     }
+
     public List<Term> getTerms(String term){
         Query query = new Query();
         Criteria c = new Criteria().where("term").is(term);
