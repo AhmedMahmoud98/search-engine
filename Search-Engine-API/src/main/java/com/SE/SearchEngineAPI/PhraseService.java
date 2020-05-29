@@ -92,7 +92,7 @@ public class PhraseService {
     	for(String document: phraseDocumentsFound) {
         	documentSize = Jsoup.connect(document).get().text().split("\\s+").length;
         	tf = phraseDocumentRepetations.get(documentsIterator)/((double)documentSize/(double)phraseStringsList.size());
-        	tfIdf = (tf * Math.log((TotalNumberOfDocuments * 1.0) / phraseDocumentsFound.size()));
+        	tfIdf = tf * (Math.log((TotalNumberOfDocuments * 1.0) / phraseDocumentsFound.size()) / Math.log(2));
         	phraseTfIdf.put(document, tfIdf);
     	}
         

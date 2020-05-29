@@ -7,10 +7,7 @@ import static org.springframework.data.mongodb.core.query.Query.query;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
 import Models.*;
 import Queries.QueryProcessor;
@@ -39,47 +36,60 @@ public class RankingService {
     }
 
     public ArrayList<String> rank(CustomQuery _query) {
-        ArrayList<String> ranked = new ArrayList<String>();
+        Map<String, Double> finalRanked = new HashMap<>();
 
         QueryProcessor.setQuery(_query.getQueryString());
         ArrayList<String> processed = QueryProcessor.process();
         List<Term> termDocs;
         List<Document_> docsPerTerm;
         String[] docs;
-        System.out.println(processed);
         double tfidf;
 
         List<String> urls = new ArrayList<String>();
-        urls.add("https://www.geeksforgeeks.org/php/");
-        urls.add("https://www.geeksforgeeks.org/category/algorithm/page/4/");
-        List<Popularity> popularityScore = getPopularity(urls);
-        
+
+        ArrayList<Double> queryTFIDF = new ArrayList<>();
+        Map<String, List<Double>> rankings = new HashMap<>();
+        List<Double> temp;
         int docsCount = getNumberOfDocuments();
-        
-        for (int i=0; i<processed.size(); i++){
-            if (processed.get(i).split("\\s+").length > 1){
+        String qWord;
+        String doc;
+        for (int i=0; i<processed.size(); i++) {
+            qWord = processed.get(i);
+            System.out.println(qWord);
+            if (qWord.split("\\s+").length > 1){
                 // Phrase
             }
-            termDocs = getTerms(processed.get(i));
-            if (!termDocs.isEmpty()){
-                docs = termDocs.get(0).getDocuments();
-                for (int j=0; j<docs.length; j++){
-                    docsPerTerm = getDocsPerTerm(termDocs.get(0).getTerm(), docs[j]);
-                    tfidf = docsPerTerm.get(j).getTermFrequency() * Math.log((docsCount*1.0) / termDocs.get(0).getTermDocumentsFreq());
-                    System.out.println(docsCount);
-                }
-            }
             else{
-                // TERM is not in DataBase.
+                termDocs = getTerms(qWord);
+                if (! termDocs.isEmpty()) {
+                    docs = termDocs.get(0).getDocuments();
+                    for (int j=0; j<docs.length; j++){
+                        doc = docs[j];
+                        urls.add(doc);
+                        rankings.computeIfAbsent(doc, k -> new ArrayList<>(processed.size()));
+
+                        docsPerTerm = getDocsPerTerm(termDocs.get(0).getTerm(), docs[j]);
+                        tfidf = docsPerTerm.get(j).getTermFrequency() * (Math.log((docsCount*1.0) / termDocs.get(0).getTermDocumentsFreq()) / Math.log(2));
+                        temp = rankings.get(doc);
+                        temp.add(i, tfidf);
+                        rankings.put(doc, temp);
+                    }
+                }
+                else{
+                    // TERM is not in DataBase.
+                }
+
             }
-
         }
+        List<Popularity> popularityScore = getPopularity(urls);
 
-
+        /*
+        System.out.println(popularityScore);
         for (int i=0; i<popularityScore.size(); i++){
-            ranked.add(popularityScore.get(i).getLink());
+            finalRanked.put(popularityScore.get(i).getLink());
         }
-        return ranked;
+        */
+        return new ArrayList<String>(finalRanked.keySet());
     }
     
     public int getNumberOfDocuments() {
@@ -88,29 +98,30 @@ public class RankingService {
 
     public List<Popularity> getPopularity(List<String> urls) {
         Query query = new Query();
-        Criteria c = new Criteria().where("link").is(urls.get(0));
-        Criteria temp = new Criteria();
-        for (int i=1; i<urls.size(); i++){
+        Criteria orCrit = new Criteria();
+        List<Criteria> orExpr = new ArrayList<Criteria>();
+        for (int i=0; i<urls.size(); i++){
             System.out.println(urls.get(i));
-            temp.where("link").is(urls.get(i));
-            c.orOperator(temp);
+            Criteria temp = new Criteria();
+            temp.and("link").is(urls.get(i));
+            orExpr.add(temp);
         }
+
         query.with(Sort.by(Sort.Direction.DESC, "popularity"))
-                //.addCriteria(c)
-                .limit(75);
+                .addCriteria(orCrit.orOperator(orExpr.toArray(new Criteria[orExpr.size()])));
         //System.out.println(this.mongoOperations.find(query, "PopularityTable"));
         return this.mongoOperations.find(query, Popularity.class);
     }
     public List<Term> getTerms(String term){
         Query query = new Query();
-        Criteria c = new Criteria().where("term").is(term); ;
+        Criteria c = new Criteria().where("term").is(term);
         query.addCriteria(c);
 
         return this.mongoOperations.find(query, Term.class);
     }
     public List<Document_> getDocsPerTerm(String term, String doc){
         Query query = new Query();
-        Criteria c = new Criteria().where("term").is(term).and("document").is(doc); ;
+        Criteria c = new Criteria().where("term").is(term).and("document").is(doc);
         query.addCriteria(c);
 
         return this.mongoOperations.find(query, Document_.class);

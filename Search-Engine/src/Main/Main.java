@@ -30,7 +30,8 @@ public class Main {
         Thread indexer = new Thread(_indexer);
         indexer.start();
 
-        //PageRank Ind = new PageRank(3, 0.7);
-        //PageRank.main(new String[]{""});
+        crawler.join();
+        PageRank Ind = new PageRank(3, 0.7);
+        PageRank.main(new String[]{""});
     }
 }

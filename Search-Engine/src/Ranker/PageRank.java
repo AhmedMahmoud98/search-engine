@@ -31,7 +31,6 @@ public class PageRank {
         double init = 1.0 / LINKS.size();
         // System.out.println(LINKS.size());
         LINKS.forEach((k, v) -> pageRank.put(k, init));
-        LINKS.forEach((k, v) -> tempPageRank.put(k, init));
 
         // System.out.println(pageRank.get("https://www.geeksforgeeks.org/greedy-algorithms"));
         // System.out.println(iterations + dampingFactor + tolerence);
