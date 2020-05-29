@@ -1,15 +1,15 @@
 package Models;
 
-import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "VisitedURLs")
 public class VisitedUrl {
-  private String visitedUrl;
+  @Indexed
   private String query;
+  private String visitedUrl;
   private int frequency;
 
-  
   public VisitedUrl() {
 
   }
@@ -34,11 +34,11 @@ public class VisitedUrl {
   
   public void setQuery(String _query) {
 	this.query = _query;
- }
+  }
   
   public String getQuery() {
 	    return query;
-	  }
+  }
 
   public void Frequency(int _frequency) {
     this.frequency = _frequency;

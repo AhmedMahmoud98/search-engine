@@ -21,6 +21,9 @@ public class Main {
         Logger mongoLogger = Logger.getLogger("org.mongodb.driver");
         mongoLogger.setLevel(Level.SEVERE); // e.g. or Log.WARNING, etc.
         
+        DbManager DBManager = DbManager.getInstance();
+		DBManager.addTablesIndices();
+		
         AtomicInteger synchronization = new AtomicInteger();
 
         CrawlerController _crawler = new CrawlerController(5, 1200, synchronization);
@@ -29,7 +32,7 @@ public class Main {
         Indexer _indexer = new Indexer(synchronization);
         Thread indexer = new Thread(_indexer);
         indexer.start();
-
+        
         //PageRank Ind = new PageRank(3, 0.7);
         //PageRank.main(new String[]{""});
     }
