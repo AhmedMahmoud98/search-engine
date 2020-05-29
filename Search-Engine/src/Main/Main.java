@@ -21,6 +21,9 @@ public class Main {
         Logger mongoLogger = Logger.getLogger("org.mongodb.driver");
         mongoLogger.setLevel(Level.SEVERE); // e.g. or Log.WARNING, etc.
         
+        DbManager DBManager = DbManager.getInstance();
+		DBManager.addTablesIndices();
+		
         AtomicInteger synchronization = new AtomicInteger();
 
         CrawlerController _crawler = new CrawlerController(5, 1200, synchronization);

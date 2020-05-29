@@ -61,6 +61,7 @@ public class ApiController {
 		    		toIdx += (sortedLinks.size() - toIdx)% sizeOfPage;
 				}
 			}
+
 		    return new ResponseEntity<>(Pages.subList(fromIdx, toIdx), HttpStatus.OK);
 		  } catch (Exception e) {
 			System.out.println(e);
@@ -118,7 +119,7 @@ public class ApiController {
   }
 
   @PostMapping("/VisitedUrls")
-  public ResponseEntity<VisitedUrl> createTutorial(@RequestParam String query,
+  public ResponseEntity<VisitedUrl> createVisitedUrl(@RequestParam String query,
 												   @RequestParam String visitedUrl) {
 	  try {
 		  VisitedUrl _visitedUrl = visitedUrlsService.saveVisitedUrl(visitedUrl, query);
@@ -128,6 +129,23 @@ public class ApiController {
 		  }
   }
   
+  @GetMapping("/Size")
+  public ResponseEntity<Integer> getSize(@RequestParam String query,
+										 @RequestParam String requestType) {
+	  try {
+		  int Result = 0;
+		  /*2l klam dh het7t f while 2n HashMap["query"] == null
+		   * 34an efdl mstny l7d ma 2l ranker e5ls f n3rf 2l size */
+		  if(requestType.equals("Pages")) 
+			  Result = 35;
+		  else if(requestType.equals("Images"))
+			  Result = 22;
+
+		  return new ResponseEntity<>(Result, HttpStatus.CREATED);
+		  } catch (Exception e) {
+		    return new ResponseEntity<>(null, HttpStatus.EXPECTATION_FAILED);
+		  }
+  }
 }
 
   
