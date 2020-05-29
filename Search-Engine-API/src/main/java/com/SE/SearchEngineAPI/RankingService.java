@@ -98,23 +98,24 @@ public class RankingService {
             avgSum += value;
             finalRanked.put(s, value);
         }
-        avgSum /= urls.size();
-        System.out.println(avgSum);
+        // Used to check for a good coefficient for the popularity part in the Scoring function.
+        // avgSum /= urls.size();
+        // System.out.println(avgSum);
 
         // Popularity score
         List<Popularity> popularityScore = getPopularity(new ArrayList<>(urls));
 
         String link;
         avgSum = 0;
-        double popScoreCoeff = 10;
+        int popScoreCoeff = 4;
         for (Popularity popularity : popularityScore) {
             link = popularity.getLink();
             value = popularity.getPopularity();
             avgSum += value;
             finalRanked.replace(link, (popScoreCoeff * value) + finalRanked.get(link));
         }
-        avgSum /= urls.size();
-        System.out.println(avgSum);
+        // avgSum /= urls.size();
+        // System.out.println(avgSum);
 
         finalRanked = sortByValue((HashMap<String, Double>) finalRanked);
         return new ArrayList<String>(finalRanked.keySet());
