@@ -39,17 +39,34 @@ public class DbManager {
     
     public void addTablesIndices() {
     	MongoDatabase SearchEngine = mongoClient.getDatabase("SearchEngine");
-    	
+    	MongoCollection<Document> crawlerCollection = SearchEngine.getCollection("CrawlerTable");
         MongoCollection<Document> termCollection = SearchEngine.getCollection("Term");
         MongoCollection<Document> documentCollection = SearchEngine.getCollection("Document");
         MongoCollection<Document> ImagesCollection = SearchEngine.getCollection("Images");
         MongoCollection<Document> popularityCollection = SearchEngine.getCollection("PopularityTable");
         
-        termCollection.createIndex(Indexes.text("term"));
-        documentCollection.createIndex(Indexes.compoundIndex(Indexes.text("term"), Indexes.text("document")));
-        ImagesCollection.createIndex(Indexes.text("term"));
-        popularityCollection.createIndex(Indexes.text("link"));
-    	
+        crawlerCollection.createIndex(Indexes.ascending("Link"));
+        crawlerCollection.createIndex(Indexes.descending("CrawledIndex"));
+        termCollection.createIndex(Indexes.ascending("term"));
+        documentCollection.createIndex(Indexes.compoundIndex(Indexes.ascending("term"), Indexes.ascending("document")));
+        ImagesCollection.createIndex(Indexes.ascending("term"));
+        popularityCollection.createIndex(Indexes.ascending("link"));
+    }
+    
+    public void dropTables() {
+    	MongoDatabase SearchEngine = mongoClient.getDatabase("SearchEngine");
+    	MongoCollection<Document> crawlerCollection = SearchEngine.getCollection("CrawlerTable");
+        MongoCollection<Document> termCollection = SearchEngine.getCollection("Term");
+        MongoCollection<Document> documentCollection = SearchEngine.getCollection("Document");
+        MongoCollection<Document> ImagesCollection = SearchEngine.getCollection("Images");
+        MongoCollection<Document> popularityCollection = SearchEngine.getCollection("PopularityTable");
+        
+        termCollection.drop();
+        documentCollection.drop();
+        ImagesCollection.drop();
+        popularityCollection.drop();
+        crawlerCollection.drop();
+   
     }
 
 ///////////////////////////////////    Crawler	 //////////////////////////////////
@@ -175,7 +192,6 @@ public class DbManager {
 
     public void savePageRank(Map<String, Double> pageRank) {
         DBCollection collection = database.getCollection("PopularityTable");
-        collection.drop();
         List<DBObject> entries= new ArrayList<DBObject>();
         for(Map.Entry<String, Double> link : pageRank.entrySet()){
             DBObject entry = new BasicDBObject()

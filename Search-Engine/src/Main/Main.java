@@ -22,6 +22,7 @@ public class Main {
         mongoLogger.setLevel(Level.SEVERE); // e.g. or Log.WARNING, etc.
         
         DbManager DBManager = DbManager.getInstance();
+        DBManager.dropTables();
 		DBManager.addTablesIndices();
 		
         AtomicInteger synchronization = new AtomicInteger();
@@ -34,7 +35,7 @@ public class Main {
         indexer.start();
 
         crawler.join();
-        PageRank Ind = new PageRank(3, 0.7);
+        PageRank _Ranker = new PageRank(3, 0.7);
         PageRank.main(new String[]{""});
     }
 }
