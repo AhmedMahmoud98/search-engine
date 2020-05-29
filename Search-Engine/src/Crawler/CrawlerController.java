@@ -10,6 +10,7 @@ import com.mongodb.DBObject;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -86,8 +87,7 @@ public class CrawlerController implements Runnable {
 		// database is empty
 
 		// Starting The Threads To Start Crawling
-		int NUMBER_OF_THREADS = 5;
-
+		
 		ArrayList<Thread> threads = new ArrayList<Thread>();
 
 		while (LINKS.size() < NUMBER_OF_WEBSITES) {
@@ -322,7 +322,16 @@ class Crawler implements Runnable {
 
 	public boolean CheckExist(String URL) {
 		for (int i = 0; i < links.size(); i++) {
-			if (links.get(i).getLinkURL().equals(URL)) {
+			if(URL.contains("//")) {
+				URL=URL.split("//")[1];
+			}
+			
+			String comp = links.get(i).getLinkURL();
+			if(comp.contains("//")) {
+				comp=comp.split("//")[1];
+				
+			}
+			if (comp.equals(URL)) {
 				return true;
 			}
 		}
@@ -337,18 +346,37 @@ class Crawler implements Runnable {
 		try {
 			document = Jsoup.connect(URL).get();
 			
+			
 			Elements linksOnPage = document.select("a[href]");
 			mCrawlerObj.setNumberOfURLs(linksOnPage.size());
 			
 
 			for (Element page : linksOnPage) {
+				//To Check If 2 differinets   urls have the same website link 
+				String toBeAddedUrl = page.attr("abs:href");
+				if(toBeAddedUrl.contains("#")) {
+					toBeAddedUrl = toBeAddedUrl.split("/#")[0];
+		    		
+		    	}
+				if (toBeAddedUrl.endsWith("/")) {
+					toBeAddedUrl = toBeAddedUrl.substring(0, toBeAddedUrl.length() - 1);
+
+				}
+				//To Check If The Content is Html page 
+				
+				if(toBeAddedUrl.contains("png")||toBeAddedUrl.contains("jpg")||toBeAddedUrl.contains("svg")||toBeAddedUrl.contains("jpeg")||toBeAddedUrl.contains("pdf")) {
+					continue;
+					
+				}
+				
+				//Start Adding to Database and Links 
 
 				synchronized (links) {
 					AddRefer(page.attr("abs:href"));
-					if (CheckRobots(page.attr("abs:href")) && !CheckExist(page.attr("abs:href"))
-							&& links.size() < CrawlerController.NUMBER_OF_WEBSITES) {
+					if (CheckRobots(page.attr("abs:href")) && !CheckExist(toBeAddedUrl)
+							&& links.size() < CrawlerController.NUMBER_OF_WEBSITES ) {
 						CrawlerObject toBeAdded = new CrawlerObject();
-						toBeAdded.setLinkURL(page.attr("abs:href"));
+						toBeAdded.setLinkURL(toBeAddedUrl);
 						links.add(toBeAdded);
 						CrawlerController.NUM_OF_K_DOCUMENTS = CrawlerController.NUM_OF_K_DOCUMENTS + 1;
 
