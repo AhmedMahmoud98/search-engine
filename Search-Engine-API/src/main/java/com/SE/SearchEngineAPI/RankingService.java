@@ -79,6 +79,8 @@ public class RankingService {
                         }
                         docsPerTerm = getDocsPerTerm(termDocs.get(0).getTerm(), docs[j]);
                         tfidf = docsPerTerm.get(0).getTermFrequency() * (Math.log((docsCount*1.0) / termDocs.get(0).getTermDocumentsFreq()) / Math.log(2));
+                        tfidf += tfidf * (docsPerTerm.get(0).isInTitle()? 1 : 0);
+
                         temp = rankings.get(doc);
                         temp.set(i, tfidf);
 

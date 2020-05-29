@@ -9,16 +9,26 @@ public class Document_ {
 	  private String document;
 	  private double termFrequency;
 	  private int[] positions;
+	  private boolean inTitle;
 	 
 	  public Document_() {
 
 	  }
 
-	  public Document_(String _term, String _document, double _termFrequency, int[] _positions) {
+	public boolean isInTitle() {
+		return inTitle;
+	}
+
+	public void setInTitle(boolean inTitle) {
+		this.inTitle = inTitle;
+	}
+
+	public Document_(String _term, String _document, double _termFrequency, int[] _positions, boolean _inTitle) {
 	    this.term = _term;
 	    this.document = _document;
 	    this.termFrequency = _termFrequency;
-	    this.positions = _positions ;
+	    this.positions = _positions;
+	    this.inTitle = _inTitle;
 	  }
 
 	  public String getTerm() {

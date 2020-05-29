@@ -23,12 +23,14 @@ public class Page {
 	try {
 		org.jsoup.nodes.Document doc = Jsoup.connect(this.url).get();
 		this.title = doc.getElementsByTag("title").text();
+		this.summary = "SUMMARY";
+		/*
 		int firstParagraphFirstIndex, firstParagraphLastIndex, secondParagraphFirstIndex, secondParagraphLastIndex;
 		String docText = doc.text();
 		firstParagraphFirstIndex = docText.indexOf(queryTerm1);
 		firstParagraphLastIndex = docText.indexOf(" ", firstParagraphFirstIndex + 100);
 		this.summary = docText.substring(firstParagraphFirstIndex, firstParagraphLastIndex) + "... ";
-		
+
 		if(queryTerm2 != "") {
 			secondParagraphFirstIndex = docText.indexOf(queryTerm2);
 			secondParagraphLastIndex = docText.indexOf(" ", secondParagraphFirstIndex + 100);
@@ -40,11 +42,13 @@ public class Page {
 		if(secondParagraphFirstIndex != -1)
 			this.summary += docText.substring(secondParagraphFirstIndex, secondParagraphLastIndex) + ".";
 		
-		/* Make The Query String bold */
+		// Make The Query String bold
 		this.summary = this.summary.replace(queryTerm1, "<b>"+ queryTerm1+"</b>");
 		
 		if(secondParagraphFirstIndex != -1)
 			this.summary = this.summary.replace(queryTerm2, "<b>"+ queryTerm2+"</b>");
+		*/
+
 	} catch (IOException e) {
 		e.printStackTrace();
 	}
