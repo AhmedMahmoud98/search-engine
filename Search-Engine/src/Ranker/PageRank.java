@@ -79,11 +79,11 @@ public class PageRank {
 
         while (objects.hasNext()) {
             Map crawledFromDB = objects.next().toMap();
-            String linkName = (String) crawledFromDB.get("Link");
-            ArrayList<String> sourceLinksArray = (ArrayList<String>) crawledFromDB.get("Source");
+            String linkName = (String) crawledFromDB.get("linkURL");
+            ArrayList<String> sourceLinksArray = (ArrayList<String>) crawledFromDB.get("pointingLinks");
             HashSet<String> sourceLinks = new HashSet<String>(sourceLinksArray);
 
-            int numberOfLinks = (int) crawledFromDB.get("Number Of Links");
+            int numberOfLinks = (int) crawledFromDB.get("numberOfURLs");
             PopularityObject c = new PopularityObject(sourceLinks, numberOfLinks);
             LINKS.put(linkName, c);
 

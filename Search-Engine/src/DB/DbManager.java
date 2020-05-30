@@ -69,12 +69,12 @@ public class DbManager {
         DBCollection collection = database.getCollection("CrawlerTable");
         for (int i =0;i<crawled.size();i++) {
         	CrawlerObject temp = crawled.get(i);
-            collection.update(new BasicDBObject("Link", temp.getLinkURL()),
-                    new BasicDBObject("Link",temp.getLinkURL())
-                    				   .append("Source", temp.getPointingLinks())
-                                      .append("Number Of Links", temp.getNumberOfURLs())
-                                      .append("Visited", temp.isVisited())
-                                      .append("CrawledIndex", i)
+            collection.update(new BasicDBObject("linkURL", temp.getLinkURL()),
+                    new BasicDBObject("linkURL",temp.getLinkURL())
+                    				   .append("pointingLinks", temp.getPointingLinks())
+                                      .append("numberOfURLs", temp.getNumberOfURLs())
+                                      .append("visited", temp.isVisited())
+                                      .append("crawledIndex", i)
                                        , true
                                        , false);
 
@@ -107,8 +107,8 @@ public class DbManager {
     public List<String> getCrawledUrls(int StartingIndex) {
     	MongoDatabase SearchEngine = mongoClient.getDatabase("SearchEngine");
         MongoCollection<Document> collection = SearchEngine.getCollection("CrawlerTable");
-    	Iterator<Document>  objects = collection.find(and(gt("CrawledIndex", StartingIndex*1000), lt("CrawledIndex", (StartingIndex+1)*1000)))
-    											.projection(Projections.include("Link")).iterator(); 
+    	Iterator<Document>  objects = collection.find(and(gt("crawledIndex", StartingIndex*1000), lt("crawledIndex", (StartingIndex+1)*1000)))
+    											.projection(Projections.include("linkURL")).iterator(); 
     	List<String> Urls = new ArrayList<String>();
     	while (objects.hasNext()) {
     		String Url = (String) new ArrayList<>(objects.next().values()).get(1);
@@ -122,6 +122,18 @@ public class DbManager {
 
         return collection.find();
 
+    }
+    
+    public void UpdateCrawler(String link,String text,String title ) {
+        DBCollection collection = database.getCollection("CrawlerTable");
+       collection.update(new BasicDBObject("Link", link),
+                new BasicDBObject("$set",   new BasicDBObject("title",title)
+     				   .append("text", text)));
+      
+        	
+            
+
+        
     }
     
 ////////////////////////////////////////////////	Indexer	    ///////////////////////////////////////

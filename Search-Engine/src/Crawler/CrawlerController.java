@@ -245,13 +245,13 @@ public class CrawlerController implements Runnable {
 
 		while (objects.hasNext()) {
 			Map crawledFromDB = objects.next().toMap();
-			String linkName = (String) crawledFromDB.get("Link");
-			ArrayList<String> sourceLinksArray = (ArrayList<String>) crawledFromDB.get("Source");
+			String linkName = (String) crawledFromDB.get("linkURL");
+			ArrayList<String> sourceLinksArray = (ArrayList<String>) crawledFromDB.get("pointingLinks");
 			HashSet<String> sourceLinks = new HashSet<String>(sourceLinksArray);
 
-			int numberOfLinks = (int) crawledFromDB.get("Number Of Links");
-			int index = (int) crawledFromDB.get("CrawledIndex");
-			boolean Visited = (boolean) crawledFromDB.get("Visited");
+			int numberOfLinks = (int) crawledFromDB.get("numberOfURLs");
+			
+			boolean Visited = (boolean) crawledFromDB.get("visited");
 			CrawlerObject c = new CrawlerObject(linkName, sourceLinks, numberOfLinks, Visited);
 			LINKS.add(c);
 		}
