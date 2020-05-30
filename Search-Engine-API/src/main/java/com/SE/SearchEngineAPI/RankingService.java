@@ -44,7 +44,9 @@ public class RankingService {
         List<Document_> docsPerTerm;
         String[] docs;
         double tfidf;
-
+        
+        long timeBefore = 0, timeAfter= 0, DBTime = 0;
+        
         Set<String> urls = new HashSet<>();
 
         ArrayList<Double> queryTFIDF = new ArrayList<>();
@@ -52,6 +54,7 @@ public class RankingService {
         for (int k=0; k < processed.size(); k++){
             queryTFIDF.add(tfidf);
         }
+        
         Map<String, List<Double>> rankings = new HashMap<>();
         List<Double> temp;
         int docsCount = getNumberOfDocuments();
@@ -63,7 +66,10 @@ public class RankingService {
                 // Phrase
             }
             else{
+            	timeBefore = System.currentTimeMillis();
                 termDocs = getTerms(qWord);
+                timeAfter = System.currentTimeMillis();
+                DBTime += timeAfter - timeBefore;
                 if (! termDocs.isEmpty()) {
                     docs = termDocs.get(0).getDocuments();
 
@@ -77,7 +83,10 @@ public class RankingService {
                             }
                             rankings.put(doc, temp);
                         }
+                        timeBefore = System.currentTimeMillis();
                         docsPerTerm = getDocsPerTerm(termDocs.get(0).getTerm(), s);
+                        timeAfter = System.currentTimeMillis();
+                        DBTime += timeAfter - timeBefore;
                         tfidf = docsPerTerm.get(0).getTermFrequency() * (Math.log((docsCount * 1.0) / termDocs.get(0).getTermDocumentsFreq()) / Math.log(2));
                         tfidf += tfidf * (docsPerTerm.get(0).isInTitle() ? 1 : 0);
 
@@ -118,6 +127,8 @@ public class RankingService {
         // System.out.println(avgSum);
 
         finalRanked = sortByValue(finalRanked);
+        System.out.println("DBTime: " + DBTime + " s");
+        System.out.println(DBTime/1000 + " s");
         return new ArrayList<>(finalRanked.keySet());
     }
     
