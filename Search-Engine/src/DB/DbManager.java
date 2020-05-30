@@ -56,6 +56,7 @@ public class DbManager {
     public void dropTables() {
     	MongoDatabase SearchEngine = mongoClient.getDatabase("SearchEngine");
     	MongoCollection<Document> crawlerCollection = SearchEngine.getCollection("CrawlerTable");
+    	MongoCollection<Document> seedsCollection = SearchEngine.getCollection("SeedsTable");
         MongoCollection<Document> termCollection = SearchEngine.getCollection("Term");
         MongoCollection<Document> documentCollection = SearchEngine.getCollection("Document");
         MongoCollection<Document> ImagesCollection = SearchEngine.getCollection("Images");
@@ -66,6 +67,7 @@ public class DbManager {
         ImagesCollection.drop();
         popularityCollection.drop();
         crawlerCollection.drop();
+        seedsCollection.drop();
    
     }
 
