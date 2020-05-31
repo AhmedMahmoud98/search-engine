@@ -53,8 +53,9 @@ public class CrawlerController implements Runnable {
 		LINKS = new ArrayList<CrawlerObject>();
 		INITIAL_SEEDS = new ArrayList<String>();
 		//////////////////////////////////////Initial Seeds for Crawling///////////////////////////////////////////////////////////////////
-		INITIAL_SEEDS.add("https://www.geeksforgeeks.org/greedy-algorithms");
-		INITIAL_SEEDS.add("https://www.geeksforgeeks.org/computer-network-tutorials");
+		//INITIAL_SEEDS.add("https://www.geeksforgeeks.org/greedy-algorithms");
+		INITIAL_SEEDS.add("https://www.techiedelight.com/");
+		//INITIAL_SEEDS.add("https://www.geeksforgeeks.org/computer-network-tutorials");
 		// Loading Previous State Of The Crawler From DataBase
 		GetCrawledLinks();
 		GetRobots();
@@ -244,13 +245,13 @@ public class CrawlerController implements Runnable {
 
 		while (objects.hasNext()) {
 			Map crawledFromDB = objects.next().toMap();
-			String linkName = (String) crawledFromDB.get("linkURL");
-			ArrayList<String> sourceLinksArray = (ArrayList<String>) crawledFromDB.get("pointingLinks");
+			String linkName = (String) crawledFromDB.get("Link");
+			ArrayList<String> sourceLinksArray = (ArrayList<String>) crawledFromDB.get("Source");
 			HashSet<String> sourceLinks = new HashSet<String>(sourceLinksArray);
 
-			int numberOfLinks = (int) crawledFromDB.get("numberOfURLs");
-			
-			boolean Visited = (boolean) crawledFromDB.get("visited");
+			int numberOfLinks = (int) crawledFromDB.get("Number Of Links");
+			int index = (int) crawledFromDB.get("CrawledIndex");
+			boolean Visited = (boolean) crawledFromDB.get("Visited");
 			CrawlerObject c = new CrawlerObject(linkName, sourceLinks, numberOfLinks, Visited);
 			LINKS.add(c);
 		}

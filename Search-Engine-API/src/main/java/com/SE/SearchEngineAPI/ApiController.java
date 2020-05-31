@@ -24,6 +24,8 @@ public class ApiController {
   private VisitedUrlsService visitedUrlsService;
   @Autowired
   private PhraseService phraseService;
+  @Autowired
+  private PageGenerationService pageGenerationService;
 
  
   @GetMapping("/Pages")
@@ -31,38 +33,33 @@ public class ApiController {
 		  									  @RequestParam String country,
 		  									  @RequestParam String pageNumber) {
 	  try {
-		  	long timeBefore = 0, timeAfter= 0, Time = 0;
+		    long timeBefore = 0, timeAfter= 0, Time = 0;
 		  	CustomQuery _query = new CustomQuery(query, country, Integer.parseInt(pageNumber));
+		  	
 		  	timeBefore = System.currentTimeMillis();
 		    trendsService.extractTrends(_query);
 		    timeAfter = System.currentTimeMillis();
 		    Time = timeAfter - timeBefore;
 		    System.out.println("Trends Time: " + Time + " ms");
+		    
 		    timeBefore = System.currentTimeMillis();
 		    suggestionsService.saveSuggestion(query);
 		    timeAfter = System.currentTimeMillis();
 		    Time = timeAfter - timeBefore;
 		    System.out.println("Suggestions Time: " + Time + " ms");
-		    List<Page> Pages = new ArrayList<Page>();
+
 		    timeBefore = System.currentTimeMillis();
 			ArrayList<String> sortedLinks = rankingService.rank(_query);
 			timeAfter = System.currentTimeMillis();
 		    Time = timeAfter - timeBefore;
 		    System.out.println("Ranking Time: " + Time + " ms");
-			String[] q = _query.getQueryString().split("\\s+");
-
-			String q1 = q[0];
-			String q2 = "";
-			if (q.length > 1)	q2 = q[1];
-			System.out.println("Size: " + sortedLinks.size() + " page");
+	
 			timeBefore = System.currentTimeMillis();
-			for(int i = 0; i < 10; i++) 
-			{
-				Pages.add(new Page(sortedLinks.get(i), q1, q2));
-			}
-		  	//for (String s : sortedLinks) {
-			 // Pages.add(new Page(s, q1, q2));
-		  	//}
+			int sizeOfPage = 10;
+			int fromIdx = (Integer.parseInt(pageNumber) - 1) * sizeOfPage;
+		    int toIdx = Math.min(fromIdx + sizeOfPage, sortedLinks.size());
+		    List<Page> Pages = new ArrayList<Page>();
+		    Pages = pageGenerationService.generatPages(sortedLinks.subList(fromIdx, toIdx), query);
 		  	timeAfter = System.currentTimeMillis();
 		    Time = timeAfter - timeBefore;
 		    System.out.println("Paging Time: " + Time + " ms");
@@ -71,12 +68,7 @@ public class ApiController {
 		      return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 		    }
 
-		    int sizeOfPage = 10;
-			int fromIdx = (Integer.parseInt(pageNumber) - 1) * sizeOfPage;
-		    int toIdx = Math.min(fromIdx + sizeOfPage, Pages.size());
-		    
-
-		    return new ResponseEntity<>(Pages.subList(fromIdx, toIdx), HttpStatus.OK);
+		    return new ResponseEntity<>(Pages, HttpStatus.OK);
 		  } catch (Exception e) {
 			System.out.println(e);
 		    return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);

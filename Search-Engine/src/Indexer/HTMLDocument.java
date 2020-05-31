@@ -7,6 +7,7 @@ import org.jsoup.nodes.Document;
 import TextProcessing.Stemmer;
 import TextProcessing.StopWords;
 import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 import java.io.IOException;
 import java.net.URL;
@@ -19,7 +20,7 @@ public class HTMLDocument {
 	private Map<String,List<String>> imageTerms;
 	private String url;
 
-	public HTMLDocument(String docIP) {
+	public HTMLDocument(String docIP, int docID) {
 		terms = new ArrayList<String>();
 		imageTerms = new HashMap<String, List<String>>();
 		try {
@@ -29,8 +30,15 @@ public class HTMLDocument {
 				Document doc = Jsoup.connect(sanitized).get();
 				String docText = doc.text();
 				String title = doc.getElementsByTag("title").text();
+				Elements p = doc.getElementsByTag("p");
+				String docTextP = "";
+				for (Element x: p) 
+					docTextP += x.text().toLowerCase();
 				parseImages(doc);
-				setTerms(docText , title);
+				int termsSize = setTerms(docText , title);
+				
+				DbManager dbManager = new DbManager();
+				dbManager.UpdateCrawler(docID, docTextP, title, termsSize);
 				
 			} catch (UnsupportedMimeTypeException e) {
 				System.out.println(url + " isn't a valid Url");				/* Not a valid Url */
@@ -108,7 +116,7 @@ public class HTMLDocument {
 		dbManager.saveImageCollection(imageTerms , url);
 	}
 
-	private void setTerms(String text , String title){
+	private int setTerms(String text , String title){
 		/* Remove any non alphanumeric charachter */
 		text = text.replaceAll("[^a-zA-Z0-9 ]", ""); // double quotes
 		text = text.toLowerCase();
@@ -144,7 +152,7 @@ public class HTMLDocument {
 				terms.add(stemmer.toString());
 			}
 		}
-		//System.out.println(terms);
+		return terms.size();
 	}
 
 	private char[] stringToChar(String str) {

@@ -56,7 +56,7 @@ public class Indexer implements Runnable {
 	        for (int i = 0; i < NUMBER_OF_THREAD; i++) {
 	            final int startIndex = i * DOCUMENTS_PER_THREAD;
 	            final int endIndex = Math.min(documentsURLs.size(), (i + 1) * DOCUMENTS_PER_THREAD);
-	            Thread indx = new Thread(new IndexerThread(documentsURLs, startIndex, endIndex));
+	            Thread indx = new Thread(new IndexerThread(documentsURLs, startIndex, endIndex, Count));
 	            indx.start();
 	            threads.add(indx);
 	        }
@@ -71,7 +71,7 @@ public class Indexer implements Runnable {
 	        threads.clear();
 	        documentsURLs.clear();
 	        this.SYNCHRONIZATION.decrementAndGet();
-	        Count+= 1;
+	        Count += 1;
     	}
     }
 
