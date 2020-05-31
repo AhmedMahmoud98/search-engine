@@ -1,7 +1,5 @@
 package com.SE.SearchEngineAPI;
 
-import org.jsoup.Jsoup;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -15,8 +13,6 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import Models.*;
-import Queries.QueryProcessor;
-import jersey.repackaged.com.google.common.collect.Sets;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
@@ -31,18 +27,20 @@ public class PhraseService {
     private MongoOperations mongoOperations;
 
     @Autowired
-    public PhraseService(MongoOperations mongoOperations) throws IOException {
+    public PhraseService(MongoOperations mongoOperations) {
         this.mongoOperations = mongoOperations;
-
     }
+
+    public PhraseService()	{ }
 
     public Map <String, Double> phraseQuery(String phrase) {
     	List<String> phraseStringsList = new ArrayList<String>(Arrays.asList(phrase.split("\\s+")));
-        Set<String> allPhraseStringsDocuments = new HashSet<String>();
+        Set<String> allPhraseStringsDocuments;
         List<Document_> termsDocumentsEntries;
      
         Map <String, Double> phraseTfIdf = new LinkedHashMap <String, Double>();
         allPhraseStringsDocuments = getAllPhraseStringsDocuments(phraseStringsList);
+        System.out.println(allPhraseStringsDocuments);
         termsDocumentsEntries = getTermsDocumentsEntries(phraseStringsList, allPhraseStringsDocuments);
         System.out.println(termsDocumentsEntries);
         phraseTfIdf = getPhraseDocumentsAndCalculateTFIDF(phraseStringsList, termsDocumentsEntries, phraseStringsList.size(),allPhraseStringsDocuments.size());
@@ -87,8 +85,9 @@ public class PhraseService {
 	    	 for(String document: documents)
 	    		 OR.add(new Criteria().and("term").is(term).and("document").is(document));
 	      
-	     if(OR != null)
-	    	 query.with(Sort.by(Sort.Direction.ASC, "document"))
+	     if(OR.isEmpty())	return new ArrayList<>();
+
+	     query.with(Sort.by(Sort.Direction.ASC, "document"))
 	    	 .addCriteria(new Criteria().orOperator(OR.toArray(new Criteria[OR.size()])))
 	    	 .fields().include("term").include("document").include("positions");
 	

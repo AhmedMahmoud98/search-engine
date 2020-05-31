@@ -1,37 +1,17 @@
 package com.SE.SearchEngineAPI;
 
-import static org.springframework.data.mongodb.core.FindAndModifyOptions.options;
-import static org.springframework.data.mongodb.core.query.Criteria.where;
-import static org.springframework.data.mongodb.core.query.Query.query;
-
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.*;
 import java.util.stream.IntStream;
 
 import Models.*;
 import Queries.QueryProcessor;
 
-import org.bson.conversions.Bson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoOperations;
-import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
-
-import com.mongodb.DBCollection;
-import com.mongodb.DBCursor;
-import com.mongodb.client.FindIterable;
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoCursor;
-
-import opennlp.tools.namefind.NameFinderME;
-import opennlp.tools.namefind.TokenNameFinderModel;
-import opennlp.tools.util.Span;
 
 @Service
 public class RankingService {
@@ -63,45 +43,59 @@ public class RankingService {
         
         Map<String, List<Double>> rankings = new HashMap<>();
         List<Double> temp;
+        List<Double> zeros = new ArrayList<>();
         timeBefore = System.currentTimeMillis();
         int docsCount = getNumberOfDocuments();
         timeAfter = System.currentTimeMillis();
         sizeTime += timeAfter - timeBefore;
         String qWord;
         String doc;
+        Map<String, Double> phraseTemp;
+        PhraseService phServ = new PhraseService(this.mongoOperations);
+
+        for (int i=0; i<processed.size(); i++){
+            zeros.add(0.0);
+        }
         for (int i = 0; i < processed.size(); i++) {
-            //if (qWord.split("\\s+").length > 1){
-                // Phrase
-            //}
-            //else {
-            //   if (termDocs.size() > i) {
-       		timeBefore = System.currentTimeMillis();
-    	    docsPerTerm = getTermDocuments(processed.get(i));
-            timeAfter = System.currentTimeMillis();
-            documentsTime += timeAfter - timeBefore;
-            
-            for (int j = 0; j < docsPerTerm.size(); j++) {
-                doc = docsPerTerm.get(j).getDocument();
-                urls.add(doc);
-                if (rankings.get(doc) == null) {
-                    temp = new ArrayList<>(processed.size());
-                    for (int k = 0; k < processed.size(); k++) {
-                        temp.add(0.0);
-                    }
-                    rankings.put(doc, temp);
+            timeBefore = System.currentTimeMillis();
+            qWord = processed.get(i);
+            if (qWord.split("\\s+").length > 1){
+                // Phrase Query
+                System.out.println(qWord);
+                phraseTemp = phServ.phraseQuery(qWord);
+                // System.out.println(phraseTemp);
+                for (String url : phraseTemp.keySet()){
+                    urls.add(url);
+                    temp = rankings.get(url);
+                    temp.set(i, phraseTemp.get(url));
+
+                    rankings.replace(url, temp);
                 }
-
-                tfidf = docsPerTerm.get(j).getTermFrequency() * (Math.log((docsCount * 1.0) / docsPerTerm.size()) / Math.log(2));
-                tfidf += tfidf * (docsPerTerm.get(j).isInTitle() ? 1 : 0);
-
-                temp = rankings.get(doc);
-                temp.set(i, tfidf);
-
-                rankings.replace(doc, temp);
             }
-         }
-            //}
-        //}
+            else {
+                docsPerTerm = getTermDocuments(qWord);
+                timeAfter = System.currentTimeMillis();
+                documentsTime += timeAfter - timeBefore;
+
+                for (int j = 0; j < docsPerTerm.size(); j++) {
+                    doc = docsPerTerm.get(j).getDocument();
+                    urls.add(doc);
+                    if (rankings.get(doc) == null) {
+                        temp = new ArrayList<>(zeros);
+                        rankings.put(doc, temp);
+                    }
+
+                    tfidf = docsPerTerm.get(j).getTermFrequency() * (Math.log((docsCount * 1.0) / docsPerTerm.size()) / Math.log(2));
+                    tfidf += tfidf * (docsPerTerm.get(j).isInTitle() ? 1 : 0);
+
+                    temp = rankings.get(doc);
+                    temp.set(i, tfidf);
+
+                    rankings.replace(doc, temp);
+                }
+            }
+        }
+
         // TF-IDF Score
         double value;
         double avgSum = 0;
@@ -132,6 +126,7 @@ public class RankingService {
         }
         // avgSum /= urls.size();
         // System.out.println(avgSum);
+
 
         finalRanked = sortByValue(finalRanked);
         System.out.println("documentsTime: " + documentsTime + " ms");
@@ -170,10 +165,11 @@ public class RankingService {
             orExpr.add(temp);
         }
 
-        if(orExpr != null)
-        	query.with(Sort.by(Sort.Direction.DESC, "popularity"))
-                	.addCriteria(orCrit.orOperator(orExpr.toArray(new Criteria[orExpr.size()])));
-        
+        if(orExpr.isEmpty())    return new ArrayList<>();
+
+        query.with(Sort.by(Sort.Direction.DESC, "popularity"))
+                .addCriteria(orCrit.orOperator(orExpr.toArray(new Criteria[orExpr.size()])));
+
         return this.mongoOperations.find(query, Popularity.class);
     }
 

@@ -23,8 +23,6 @@ public final class QueryProcessor {
     }
 
     public static ArrayList<String> process(){
-        query = query.toLowerCase();
-        // query = query.replaceAll("[^a-zA-Z0-9 ]", "");
         String[] temp = query.split("\\s+");
         List<String> stopWords = StopWords.getStopWords();
 
@@ -47,6 +45,7 @@ public final class QueryProcessor {
                 }
             }
             else if (!stopWords.contains(s)) {
+                s = s.toLowerCase();
                 s = s.replaceAll("[^a-zA-Z0-9 ]", "");
                 stemmer.add(stringToChar(s), s.length());
                 stemmer.stem();
