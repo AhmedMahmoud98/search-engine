@@ -1,5 +1,7 @@
 package Indexer;
 import DB.DbManager;
+
+import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
 import org.jsoup.UnsupportedMimeTypeException;
 import org.jsoup.nodes.Document;
@@ -10,6 +12,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
+import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -40,10 +43,9 @@ public class HTMLDocument {
 				DbManager dbManager = new DbManager();
 				dbManager.UpdateCrawler(docID, docTextP, title, termsSize);
 				
-			} catch (UnsupportedMimeTypeException e) {
-				System.out.println(url + " isn't a valid Url");				/* Not a valid Url */
+			} catch (UnsupportedMimeTypeException | HttpStatusException | SocketTimeoutException e) {
+				System.out.println("error fetching " + url);				/* Not a valid Url */
 			}
-
 		} catch (IOException e) {
 			e.printStackTrace(); 
 		}

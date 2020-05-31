@@ -42,7 +42,7 @@ public class PageGenerationService {
 	    		link = getLinkData(linkURL);
 	    		pages.add(new Page(link.getLinkURL(),link.getTitle(),this.getSummary(link.getText(), queryTerm1, queryTerm2)));
 	    	}
-	    	System.out.println(Links);
+
 	    	return pages;
 	    	
 	    }
@@ -83,12 +83,12 @@ public class PageGenerationService {
 				summary += linkText.substring(secondParagraphFirstIndex, Math.min(secondParagraphLastIndex, linkText.length())) + "...";
 
 			if(!queryTerm1.equals("") && summary != null ) 
-				summary = summary.replace(queryTerm1, "<strong>"+ queryTerm1+"</strong>");
+				summary = summary.replace(queryTerm1, "<strong>"+ queryTerm1 +"</strong>");
 			
 			if(!queryTerm2.equals("") && summary != null )
-				summary = summary.replace(queryTerm2, "<strong>"+ queryTerm2+"</strong>");
-			
-			if(summary == null)
+				summary = summary.replace(queryTerm2, "<strong>"+ queryTerm2 +"</strong>");
+		
+			if(summary.equals(""))
 				summary = linkText.substring(0, Math.min(200, linkText.length())) + "...";
 	    	
 	    	return summary;

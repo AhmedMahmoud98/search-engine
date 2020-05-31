@@ -43,7 +43,7 @@ public class PhraseService {
         System.out.println(allPhraseStringsDocuments);
         termsDocumentsEntries = getTermsDocumentsEntries(phraseStringsList, allPhraseStringsDocuments);
         System.out.println(termsDocumentsEntries);
-        phraseTfIdf = getPhraseDocumentsAndCalculateTFIDF(phraseStringsList, termsDocumentsEntries, phraseStringsList.size(),allPhraseStringsDocuments.size());
+        phraseTfIdf = getPhraseDocumentsAndCalculateTFIDF(phraseStringsList, termsDocumentsEntries, phraseStringsList.size(), allPhraseStringsDocuments.size());
         
         System.out.println(phraseTfIdf.toString());
         return phraseTfIdf;
@@ -64,7 +64,7 @@ public class PhraseService {
     }
     
     public List<Document_> getTermsDocuments(List<String> terms){
-   	 Query query = new Query();
+   	 	Query query = new Query();
          
         List<Criteria> OR = new ArrayList<>();
         for (String term : terms) 

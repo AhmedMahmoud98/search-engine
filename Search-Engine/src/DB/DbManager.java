@@ -184,9 +184,13 @@ public class DbManager {
     public void saveImageCollection(Map<String,List<String>> terms, String url){
         DBCollection collection = database.getCollection("Images");
         for (Map.Entry<String,List<String>> entry : terms.entrySet()) {
+            List<String> urls = new ArrayList<String>();
+            for (int i = 0 ; i < entry.getValue().size() ; i++){
+                urls.add(url);
+            }
             collection.update(new BasicDBObject("term", entry.getKey()),
                     new BasicDBObject("$push", new BasicDBObject("imageUrl", new BasicDBObject("$each", entry.getValue()))
-                            .append("websiteUrl", url))
+                            .append("websiteUrl", new BasicDBObject("$each" , urls)))
                     , true
                     , false);
         }
