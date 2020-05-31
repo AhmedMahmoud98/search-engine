@@ -45,7 +45,7 @@ public class PhraseService {
         allPhraseStringsDocuments = getAllPhraseStringsDocuments(phraseStringsList);
         termsDocumentsEntries = getTermsDocumentsEntries(phraseStringsList, allPhraseStringsDocuments);
         System.out.println(termsDocumentsEntries);
-        phraseTfIdf = getPhraseDocumentsAndCalculateTFIDF(phraseStringsList, termsDocumentsEntries, phraseStringsList.size(),allPhraseStringsDocuments.size());
+        phraseTfIdf = getPhraseDocumentsAndCalculateTFIDF(phraseStringsList, termsDocumentsEntries, phraseStringsList.size(), allPhraseStringsDocuments.size());
         
         System.out.println(phraseTfIdf.toString());
         return phraseTfIdf;
