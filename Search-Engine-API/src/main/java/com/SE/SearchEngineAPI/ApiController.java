@@ -75,7 +75,7 @@ public class ApiController {
 			  									@RequestParam String country,
 			  									@RequestParam String pageNumber) {
 	  try {
-		    CustomQuery _query = new CustomQuery(query, country, Integer.valueOf(pageNumber));
+		    CustomQuery _query = new CustomQuery(query, country, Integer.parseInt(pageNumber));
 		    List<Image> Images = new ArrayList<Image>();
 		    
 		    if (Images.isEmpty()) {
