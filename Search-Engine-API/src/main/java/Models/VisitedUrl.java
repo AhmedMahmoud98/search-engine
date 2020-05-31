@@ -1,12 +1,14 @@
 package Models;
 
+import org.springframework.data.mongodb.core.index.CompoundIndex;
+
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+@CompoundIndex(name = "keyindex", def = "{'queryTerm' : 1, 'visitedUrl' : 1}")
 @Document(collection = "VisitedURLs")
 public class VisitedUrl {
-  @Indexed
-  private String query;
+  private String queryTerm;
   private String visitedUrl;
   private int frequency;
 
@@ -16,7 +18,7 @@ public class VisitedUrl {
 
   public VisitedUrl(String _visitedUrl, String _query, int _frequency) {
     this.visitedUrl = _visitedUrl;
-    this.query = _query;
+    this.queryTerm = _query;
     this.frequency = _frequency;
   }
 
@@ -33,11 +35,11 @@ public class VisitedUrl {
   }
   
   public void setQuery(String _query) {
-	this.query = _query;
+	this.queryTerm = _query;
   }
   
   public String getQuery() {
-	    return query;
+	    return queryTerm;
   }
 
   public void Frequency(int _frequency) {
@@ -47,7 +49,7 @@ public class VisitedUrl {
   @Override
   public String toString() {
     return "VisitedUrl [visitedUrl=" + this.visitedUrl +
-    		", query=" + this.query + 
+    		", query=" + this.queryTerm + 
     		", frequency=" + this.frequency +"]";
   }
 }

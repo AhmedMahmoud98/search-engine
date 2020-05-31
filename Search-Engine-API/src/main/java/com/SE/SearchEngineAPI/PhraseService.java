@@ -66,7 +66,7 @@ public class PhraseService {
     }
     
     public List<Document_> getTermsDocuments(List<String> terms){
-   	 Query query = new Query();
+   	 	Query query = new Query();
          
         List<Criteria> OR = new ArrayList<>();
         for (String term : terms) 

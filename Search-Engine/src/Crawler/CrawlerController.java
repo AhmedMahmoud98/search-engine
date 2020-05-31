@@ -54,7 +54,8 @@ public class CrawlerController implements Runnable {
 		INITIAL_SEEDS = new ArrayList<String>();
 		//////////////////////////////////////Initial Seeds for Crawling///////////////////////////////////////////////////////////////////
 		//INITIAL_SEEDS.add("https://www.geeksforgeeks.org/greedy-algorithms");
-		INITIAL_SEEDS.add("https://www.techiedelight.com/");
+		//INITIAL_SEEDS.add("https://www.techiedelight.com/");
+		INITIAL_SEEDS.add("https://www.kingfut.com/");
 		//INITIAL_SEEDS.add("https://www.geeksforgeeks.org/computer-network-tutorials");
 		// Loading Previous State Of The Crawler From DataBase
 		GetCrawledLinks();

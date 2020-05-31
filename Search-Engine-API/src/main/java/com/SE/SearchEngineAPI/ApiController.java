@@ -26,12 +26,13 @@ public class ApiController {
   private PhraseService phraseService;
   @Autowired
   private PageGenerationService pageGenerationService;
-
+  @Autowired
+  private ImagesService imagesService;
  
   @GetMapping("/Pages")
-  public ResponseEntity<List<Page>> getPages (@RequestParam String query,
-		  									  @RequestParam String country,
-		  									  @RequestParam String pageNumber) {
+  public ResponseEntity<Pages> getPages (@RequestParam String query,
+		  								 @RequestParam String country,
+		  								 @RequestParam String pageNumber) {
 	  try {
 		    long timeBefore = 0, timeAfter= 0, Time = 0;
 		  	CustomQuery _query = new CustomQuery(query, country, Integer.parseInt(pageNumber));
@@ -58,17 +59,18 @@ public class ApiController {
 			int sizeOfPage = 10;
 			int fromIdx = (Integer.parseInt(pageNumber) - 1) * sizeOfPage;
 		    int toIdx = Math.min(fromIdx + sizeOfPage, sortedLinks.size());
-		    List<Page> Pages = new ArrayList<Page>();
-		    Pages = pageGenerationService.generatPages(sortedLinks.subList(fromIdx, toIdx), query);
+		    List<Page> pagesList = new ArrayList<Page>();
+		    pagesList = pageGenerationService.generatPages(sortedLinks.subList(fromIdx, toIdx), query);
+		    Pages pages = new Pages(pagesList, sortedLinks.size());
 		  	timeAfter = System.currentTimeMillis();
 		    Time = timeAfter - timeBefore;
 		    System.out.println("Paging Time: " + Time + " ms");
 
-		    if (Pages.isEmpty()) {
+		    if (pagesList.isEmpty()) {
 		      return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 		    }
 
-		    return new ResponseEntity<>(Pages, HttpStatus.OK);
+		    return new ResponseEntity<>(pages, HttpStatus.OK);
 		  } catch (Exception e) {
 			System.out.println(e);
 		    return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -76,17 +78,23 @@ public class ApiController {
   }
   
   @GetMapping("/Images")
-  public ResponseEntity<List<Image>> getImages(@RequestParam String query,
-			  									@RequestParam String country,
-			  									@RequestParam String pageNumber) {
+  public ResponseEntity<Images> getImages(@RequestParam String query,
+			  							  @RequestParam String country,
+			  							  @RequestParam String pageNumber) {
 	  try {
-		    CustomQuery _query = new CustomQuery(query, country, Integer.valueOf(pageNumber));
-		    List<Image> Images = new ArrayList<Image>();
+		    List<Image> imagesList = imagesService.getImages(query);
+		    System.out.println(imagesList);
+		    System.out.println("empty");
+		    int sizeOfPage = 20;
+		    int fromIdx = (Integer.parseInt(pageNumber) - 1) * sizeOfPage;
+		    int toIdx = Math.min(fromIdx + sizeOfPage, imagesList.size());
+
+		    Images images = new Images(imagesList.subList(fromIdx, toIdx), imagesList.size());
 		    
-		    if (Images.isEmpty()) {
+		    if (imagesList.isEmpty()) {
 		      return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 		    }
-		    return new ResponseEntity<>(Images, HttpStatus.OK);
+		    return new ResponseEntity<>(images, HttpStatus.OK);
 		  } catch (Exception e) {
 		    return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
 		  }
@@ -126,32 +134,15 @@ public class ApiController {
 
   @PostMapping("/VisitedUrls")
   public ResponseEntity<VisitedUrl> createVisitedUrl(@RequestParam String query,
-												   @RequestParam String visitedUrl) {
+												   	 @RequestParam String visitedUrl) {
 	  try {
-		  VisitedUrl _visitedUrl = visitedUrlsService.saveVisitedUrl(visitedUrl, query);
-		  return new ResponseEntity<>(_visitedUrl, HttpStatus.CREATED);
+		  visitedUrlsService.saveVisitedUrl(visitedUrl, query);
+		  return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 		  } catch (Exception e) {
 		    return new ResponseEntity<>(null, HttpStatus.EXPECTATION_FAILED);
 		  }
   }
   
-  @GetMapping("/Size")
-  public ResponseEntity<Integer> getSize(@RequestParam String query,
-										 @RequestParam String requestType) {
-	  try {
-		  int Result = 0;
-		  /*2l klam dh het7t f while 2n HashMap["query"] == null
-		   * 34an efdl mstny l7d ma 2l ranker e5ls f n3rf 2l size */
-		  if(requestType.equals("Pages")) 
-			  Result = 35;
-		  else if(requestType.equals("Images"))
-			  Result = 22;
-
-		  return new ResponseEntity<>(Result, HttpStatus.CREATED);
-		  } catch (Exception e) {
-		    return new ResponseEntity<>(null, HttpStatus.EXPECTATION_FAILED);
-		  }
-  }
 }
 
   
