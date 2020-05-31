@@ -82,6 +82,7 @@ public class ApiController {
 			  							  @RequestParam String country,
 			  							  @RequestParam String pageNumber) {
 	  try {
+
 		    List<Image> imagesList = imagesService.getImages(query);
 		    System.out.println(imagesList);
 		    System.out.println("empty");
@@ -90,7 +91,7 @@ public class ApiController {
 		    int toIdx = Math.min(fromIdx + sizeOfPage, imagesList.size());
 
 		    Images images = new Images(imagesList.subList(fromIdx, toIdx), imagesList.size());
-		    
+
 		    if (imagesList.isEmpty()) {
 		      return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 		    }
