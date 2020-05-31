@@ -11,22 +11,22 @@ public class IndexerThread implements Runnable {
 	private final int MEMORY_LIMIT = 640000000;
 	
 	/* Inverted File Dictionaries */
-	private Map <String, Set<String>> termDictionary;
 	private Map <termDocumentKey, List<Integer>> termDocumentDictionary;
 	
 	/* The Documents that this Thread should Process */
 	private List<String> documentsURLs;
 	private int docStartIndex;
 	private int docEndIndex;
+	private int iterationNum;
 
 	/* Constructor */
-	public IndexerThread(List<String> docsURLs, int docStIdx, int docEndIdx ){
+	public IndexerThread(List<String> docsURLs, int docStIdx, int docEndIdx, int _iterationNum){
 
 		this.docStartIndex = docStIdx;
 		this.docEndIndex = docEndIdx;
+		this.iterationNum = _iterationNum;
 		this.documentsURLs = docsURLs;
-		
-		this.termDictionary = new LinkedHashMap <String, Set<String>>();
+
 		this.termDocumentDictionary = new LinkedHashMap <termDocumentKey, List<Integer>>();
 
 	}
@@ -61,8 +61,7 @@ public class IndexerThread implements Runnable {
 			{
 				/* Write The Inverted File to the DB, Remove It from Memory then Continue To Process Documents */ 
 				StoreDictonaries(documentsSizes);
-				
-				termDictionary.clear();
+
 				termDocumentDictionary.clear();
 			}
 			
@@ -70,8 +69,9 @@ public class IndexerThread implements Runnable {
 			String documentURL = documentsURLs.get(i);
 			tempURL = documentURL.replaceAll("[\uFEFF-\uFFFF]", "");
 			if(this.isValid(tempURL)) {
+
 				/* Invoke HTMLDocument constrictor to tokenize html  */
-				document = new HTMLDocument(tempURL);
+				document = new HTMLDocument(tempURL, i + this.iterationNum * 1000);
 				
 				/* The Processed Document ID with Its Terms */
 				List<String> terms = document.getTerms();
@@ -90,20 +90,8 @@ public class IndexerThread implements Runnable {
 						flag = false;
 						continue;
 					}
-					Set<String> termDocumentsUrls = null;
-					/* Check If This Term is already appeared in other Document */
-					if (termDictionary.get(term) == null) 
-					{
-						/* Make a New List For This Term */
-						termDocumentsUrls = new HashSet<String>();
-						termDictionary.put(term, termDocumentsUrls);
-					}
-					else 
-						/* Get This Term List */
-						termDocumentsUrls = termDictionary.get(term);
 					
 					/* Add This Document To the Term List */ 
-					termDocumentsUrls.add(tempURL);
 					List<Integer> termDocumentPositions= null;
 					termDocumentKey Key = new termDocumentKey(term, tempURL);
 					/* Check If This Terms is already appeared in This Document */
@@ -130,14 +118,12 @@ public class IndexerThread implements Runnable {
 		}
 		/* Write The Inverted File to the DB, Remove It from Memory then Continue To Process Documents */
 		StoreDictonaries(documentsSizes);
-		termDictionary.clear();
 		termDocumentDictionary.clear();
 		documentsSizes.clear();
 	}
 	
 	private void StoreDictonaries(Map<String, Integer> documentsSizes) {
 		DbManager DBManager = DbManager.getInstance();
-		DBManager.saveTermCollection(termDictionary);
 		DBManager.saveDocumentCollection(termDocumentDictionary, documentsSizes);
 	}
 	

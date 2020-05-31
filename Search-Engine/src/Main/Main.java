@@ -8,7 +8,6 @@ import java.util.logging.Logger;
 import Crawler.CrawlerController;
 import DB.DbManager;
 import Indexer.Indexer;
-import Indexer.IndexerThread;
 import Ranker.PageRank;
 
 import java.util.logging.Level;
@@ -22,11 +21,11 @@ public class Main {
         mongoLogger.setLevel(Level.SEVERE); // e.g. or Log.WARNING, etc.
         
         DbManager DBManager = DbManager.getInstance();
+        DBManager.dropTables();
 		DBManager.addTablesIndices();
-		
         AtomicInteger synchronization = new AtomicInteger();
 
-        CrawlerController _crawler = new CrawlerController(5, 1200, synchronization);
+        CrawlerController _crawler = new CrawlerController(5, 2000, synchronization);
         Thread crawler = new Thread(_crawler);
         crawler.start();
         Indexer _indexer = new Indexer(synchronization);
@@ -34,7 +33,7 @@ public class Main {
         indexer.start();
 
         crawler.join();
-        PageRank Ind = new PageRank(3, 0.7);
+        PageRank _Ranker = new PageRank(3, 0.7);
         PageRank.main(new String[]{""});
     }
 }

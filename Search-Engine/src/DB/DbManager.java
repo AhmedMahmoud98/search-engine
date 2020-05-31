@@ -1,9 +1,13 @@
 package DB;
 import org.bson.Document;
+import org.bson.conversions.Bson;
+
 import com.mongodb.*;
 import com.mongodb.client.*;
 import com.mongodb.client.model.Indexes;
 import com.mongodb.client.model.Projections;
+import com.mongodb.client.result.UpdateResult;
+
 import static com.mongodb.client.model.Filters.*;
 
 import com.mongodb.MongoClient;
@@ -39,17 +43,34 @@ public class DbManager {
     
     public void addTablesIndices() {
     	MongoDatabase SearchEngine = mongoClient.getDatabase("SearchEngine");
-    	
-        MongoCollection<Document> termCollection = SearchEngine.getCollection("Term");
+    	MongoCollection<Document> crawlerCollection = SearchEngine.getCollection("CrawlerTable");
         MongoCollection<Document> documentCollection = SearchEngine.getCollection("Document");
         MongoCollection<Document> ImagesCollection = SearchEngine.getCollection("Images");
         MongoCollection<Document> popularityCollection = SearchEngine.getCollection("PopularityTable");
         
-        termCollection.createIndex(Indexes.text("term"));
-        documentCollection.createIndex(Indexes.compoundIndex(Indexes.text("term"), Indexes.text("document")));
-        ImagesCollection.createIndex(Indexes.text("term"));
-        popularityCollection.createIndex(Indexes.text("link"));
-    	
+        crawlerCollection.createIndex(Indexes.ascending("Link"));
+        crawlerCollection.createIndex(Indexes.ascending("CrawledIndex"));
+        documentCollection.createIndex(Indexes.ascending("term"));
+        documentCollection.createIndex(Indexes.compoundIndex(Indexes.ascending("term"),Indexes.ascending("document")));
+        ImagesCollection.createIndex(Indexes.ascending("term"));
+        popularityCollection.createIndex(Indexes.ascending("link"));
+        popularityCollection.createIndex(Indexes.descending("popularity"));
+    }
+    
+    public void dropTables() {
+    	MongoDatabase SearchEngine = mongoClient.getDatabase("SearchEngine");
+    	MongoCollection<Document> crawlerCollection = SearchEngine.getCollection("CrawlerTable");
+    	MongoCollection<Document> seedsCollection = SearchEngine.getCollection("SeedsTable");
+        MongoCollection<Document> documentCollection = SearchEngine.getCollection("Document");
+        MongoCollection<Document> ImagesCollection = SearchEngine.getCollection("Images");
+        MongoCollection<Document> popularityCollection = SearchEngine.getCollection("PopularityTable");
+        
+        documentCollection.drop();
+        ImagesCollection.drop();
+        popularityCollection.drop();
+        crawlerCollection.drop();
+        seedsCollection.drop();
+   
     }
 
 ///////////////////////////////////    Crawler	 //////////////////////////////////
@@ -67,18 +88,23 @@ public class DbManager {
     
     public void saveCrawler(ArrayList<CrawlerObject> crawled ) {
         DBCollection collection = database.getCollection("CrawlerTable");
-        for (int i =0;i<crawled.size();i++) {
+        int collectionSize = (int) collection.count();
+
+        for (int i = collectionSize; i < crawled.size();i++) {
         	CrawlerObject temp = crawled.get(i);
-            collection.update(new BasicDBObject("Link", temp.getLinkURL()),
-                    new BasicDBObject("Link",temp.getLinkURL())
-                    				   .append("Source", temp.getPointingLinks())
-                                      .append("Number Of Links", temp.getNumberOfURLs())
-                                      .append("Visited", temp.isVisited())
-                                      .append("CrawledIndex", i)
+            collection.update(new BasicDBObject("linkURL", temp.getLinkURL()),
+                   new BasicDBObject("linkURL",temp.getLinkURL())
+                    				   .append("pointingLinks", temp.getPointingLinks())
+                                       .append("numberOfURLs", temp.getNumberOfURLs())
+                                       .append("visited", temp.isVisited())
+                                       .append("crawledIndex", i)
+                                       .append("title", "")
+                                       .append("text", "")
+                                       .append("textSize","")
                                        , true
                                        , false);
-
         }
+        
     }
     
     public void saveSeeds(ArrayList<SeedsObject> seeds) {
@@ -107,8 +133,8 @@ public class DbManager {
     public List<String> getCrawledUrls(int StartingIndex) {
     	MongoDatabase SearchEngine = mongoClient.getDatabase("SearchEngine");
         MongoCollection<Document> collection = SearchEngine.getCollection("CrawlerTable");
-    	Iterator<Document>  objects = collection.find(and(gt("CrawledIndex", StartingIndex*1000), lt("CrawledIndex", (StartingIndex+1)*1000)))
-    											.projection(Projections.include("Link")).iterator(); 
+    	Iterator<Document>  objects = collection.find(and(gte("crawledIndex", StartingIndex*1000), lt("crawledIndex", (StartingIndex+1)*1000)))
+    											.projection(Projections.include("linkURL")).iterator(); 
     	List<String> Urls = new ArrayList<String>();
     	while (objects.hasNext()) {
     		String Url = (String) new ArrayList<>(objects.next().values()).get(1);
@@ -119,23 +145,19 @@ public class DbManager {
     
     public DBCursor getRobots(){
     	DBCollection collection = database.getCollection("Robot");
-
         return collection.find();
-
+    }
+    
+    public void UpdateCrawler(int index, String text, String title, int termsSize) {
+    	MongoDatabase SearchEngine = mongoClient.getDatabase("SearchEngine");
+    	MongoCollection<Document> crawlerCollection = SearchEngine.getCollection("CrawlerTable");
+    	BasicDBObject updateQuery = new BasicDBObject();
+    	Bson filter = eq("crawledIndex", index);
+    	updateQuery.put("$set", new BasicDBObject("text",text).append("title", title).append("textSize", termsSize));
+    	crawlerCollection.updateOne(filter, updateQuery);
     }
     
 ////////////////////////////////////////////////	Indexer	    ///////////////////////////////////////
-    public void saveTermCollection( Map<String , Set<String>> terms){
-        DBCollection collection = database.getCollection("Term");
-        for (Map.Entry<String,Set<String>> entry : terms.entrySet()) {
-            collection.update(new BasicDBObject("term", entry.getKey()),
-                    new BasicDBObject("$inc", new BasicDBObject("termDocumentsFreq", entry.getValue().size()))
-                                      .append("$push" , new BasicDBObject("documents", new BasicDBObject("$each", entry.getValue())))
-                                       , true
-                                       , false);
-        }
-    }
-    
     public void saveDocumentCollection( Map<termDocumentKey, List<Integer>> terms, Map<String, Integer> documentsSizes){
         DBCollection collection = database.getCollection("Document");
         List<DBObject> entries= new ArrayList<DBObject>();
@@ -175,7 +197,6 @@ public class DbManager {
 
     public void savePageRank(Map<String, Double> pageRank) {
         DBCollection collection = database.getCollection("PopularityTable");
-        collection.drop();
         List<DBObject> entries= new ArrayList<DBObject>();
         for(Map.Entry<String, Double> link : pageRank.entrySet()){
             DBObject entry = new BasicDBObject()

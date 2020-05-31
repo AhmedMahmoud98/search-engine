@@ -1,5 +1,7 @@
 package Models;
 
+import java.util.Arrays;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -15,6 +17,46 @@ public class Document_ {
 
 	  }
 
+    public Document_(String _term, String _document, double _termFrequency, int[] _positions, boolean _inTitle) {
+	    this.term = _term;
+	    this.document = _document;
+	    this.termFrequency = _termFrequency;
+	    this.positions = _positions;
+	    this.inTitle = _inTitle;
+	}
+
+	public String getTerm() {
+		return term;
+	}
+
+	public void setTerm(String term) {
+		this.term = term;
+	}
+
+	public String getDocument() {
+		return document;
+	}
+
+	public void setDocument(String document) {
+		this.document = document;
+	}
+
+	public double getTermFrequency() {
+		return termFrequency;
+	}
+
+	public void setTermFrequency(double termFrequency) {
+		this.termFrequency = termFrequency;
+	}
+
+	public int[] getPositions() {
+		return positions;
+	}
+
+	public void setPositions(int[] positions) {
+		this.positions = positions;
+	}
+	
 	public boolean isInTitle() {
 		return inTitle;
 	}
@@ -23,52 +65,13 @@ public class Document_ {
 		this.inTitle = inTitle;
 	}
 
-	public Document_(String _term, String _document, double _termFrequency, int[] _positions, boolean _inTitle) {
-	    this.term = _term;
-	    this.document = _document;
-	    this.termFrequency = _termFrequency;
-	    this.positions = _positions;
-	    this.inTitle = _inTitle;
-	  }
+	@Override
+	public String toString() {
+		return "Document_ [term=" + term + ", document=" + document + ", termFrequency=" + termFrequency
+				+ ", positions=" + Arrays.toString(positions) + ", inTitle=" + inTitle + "]";
+	}
 
-	  public String getTerm() {
-	    return this.term;
-	  }
-	  
-	  public String getDocument() {
-		  return this.document;
-	  }
-
-	  public double getTermFrequency() {
-		  return this.termFrequency;
-	  }
-	  
-	  public int[] getPositions() {
-		  return this.positions;
-	  }
-	  
-	  public void setTerm(String _term) {
-		  this.term = _term;
-	  }
-	  
-	  public void setDocument(String _document) {
-		  this.document = _document;
-	  }
-	  
-	  public void setTermFrequency(double freq) {
-		  this.termFrequency =  freq;
-	  }
-	  
-	  public void setPositions(int[] _positions) {
-		  this.positions =  _positions;
-	  }
 	  
 
-	  @Override
-	  public String toString() {
-	    return "Document [term=" + this.term + ", "
-	    		+ "document=" + this.document + ","
-	    		+ " termFrequency=" + this.termFrequency +"]";
-	  }
 	}
 
