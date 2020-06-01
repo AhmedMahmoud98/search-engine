@@ -44,16 +44,13 @@ public class RankingService {
         Map<String, List<Double>> rankings = new HashMap<>();
         List<Double> temp;
         List<Double> zeros = new ArrayList<>();
-        timeBefore = System.currentTimeMillis();
         int docsCount = getNumberOfDocuments();
-        timeAfter = System.currentTimeMillis();
-        sizeTime += timeAfter - timeBefore;
         String qWord;
         String doc;
         Map<String, Double> phraseTemp;
         PhraseService phServ = new PhraseService(this.mongoOperations);
 
-        for (int i=0; i<processed.size(); i++){
+        for (int i = 0; i < processed.size(); i++){
             zeros.add(0.0);
         }
         for (int i = 0; i < processed.size(); i++) {
@@ -61,21 +58,20 @@ public class RankingService {
             qWord = processed.get(i);
             if (qWord.split("\\s+").length > 1){
                 // Phrase Query
-                System.out.println(qWord);
+
                 phraseTemp = phServ.phraseQuery(qWord);
-                // System.out.println(phraseTemp);
                 for (String url : phraseTemp.keySet()){
                     urls.add(url);
+                    if (rankings.get(url) == null) {
+                        temp = new ArrayList<>(zeros);
+                        rankings.put(url, temp);
+                    }
                     temp = rankings.get(url);
                     temp.set(i, phraseTemp.get(url));
-
-                    rankings.replace(url, temp);
                 }
             }
             else {
                 docsPerTerm = getTermDocuments(qWord);
-                timeAfter = System.currentTimeMillis();
-                documentsTime += timeAfter - timeBefore;
 
                 for (int j = 0; j < docsPerTerm.size(); j++) {
                     doc = docsPerTerm.get(j).getDocument();
@@ -90,8 +86,6 @@ public class RankingService {
 
                     temp = rankings.get(doc);
                     temp.set(i, tfidf);
-
-                    rankings.replace(doc, temp);
                 }
             }
         }
@@ -110,10 +104,8 @@ public class RankingService {
         // System.out.println(avgSum);
 
         // Popularity score
-        timeBefore = System.currentTimeMillis();
+
         List<Popularity> popularityScore = getPopularity(new ArrayList<>(urls));
-        timeAfter = System.currentTimeMillis();
-        popTime += timeAfter - timeBefore;
 
         String link;
         avgSum = 0;
@@ -127,12 +119,7 @@ public class RankingService {
         // avgSum /= urls.size();
         // System.out.println(avgSum);
 
-
         finalRanked = sortByValue(finalRanked);
-        System.out.println("documentsTime: " + documentsTime + " ms");
-        System.out.println("popTime: " + popTime + " ms");
-        System.out.println("sizeTime: " + sizeTime + " ms");
-        System.out.println("DBTime: " + (documentsTime + popTime + sizeTime) + " ms");
         return new ArrayList<>(finalRanked.keySet());
     }
     

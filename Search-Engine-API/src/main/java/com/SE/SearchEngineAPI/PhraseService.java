@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import Models.*;
+import Queries.QueryProcessor;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
@@ -34,19 +35,35 @@ public class PhraseService {
     public PhraseService()	{ }
 
     public Map <String, Double> phraseQuery(String phrase) {
-    	List<String> phraseStringsList = new ArrayList<String>(Arrays.asList(phrase.split("\\s+")));
+    	QueryProcessor.setQuery(phrase);
+        List<String> phraseStringsList = QueryProcessor.process();
         Set<String> allPhraseStringsDocuments;
         List<Document_> termsDocumentsEntries;
      
         Map <String, Double> phraseTfIdf = new LinkedHashMap <String, Double>();
         allPhraseStringsDocuments = getAllPhraseStringsDocuments(phraseStringsList);
-        System.out.println(allPhraseStringsDocuments);
         termsDocumentsEntries = getTermsDocumentsEntries(phraseStringsList, allPhraseStringsDocuments);
-        System.out.println(termsDocumentsEntries);
+        termsDocumentsEntries = handleDuplicates(termsDocumentsEntries, phraseStringsList);
         phraseTfIdf = getPhraseDocumentsAndCalculateTFIDF(phraseStringsList, termsDocumentsEntries, phraseStringsList.size(), allPhraseStringsDocuments.size());
         
-        System.out.println(phraseTfIdf.toString());
         return phraseTfIdf;
+    }
+    
+    public  List<Document_>  handleDuplicates(List<Document_> termsDocumentsEntries, List<String> phraseStringsList) {
+    	Set<String> duplicates = new HashSet<>();
+    	Set<String> uniques = new HashSet<>();
+
+    	List<Document_> dupDocuments = new ArrayList<Document_>();
+    	for(String term: phraseStringsList)
+    		if (!uniques.add(term))
+    			duplicates.add(term);
+   
+		for(Document_ document: termsDocumentsEntries)
+			if(duplicates.contains(document.getTerm()))
+				dupDocuments.add(document);
+		
+		termsDocumentsEntries.addAll(dupDocuments);
+    	return termsDocumentsEntries;
     }
     
     
@@ -72,7 +89,7 @@ public class PhraseService {
          
         if(OR != null)
        	 query.addCriteria(new Criteria().orOperator(OR.toArray(new Criteria[OR.size()])))
-       	 .fields().include("document"); 
+       	 .fields().include("document").include("term"); 
 
        return this.mongoOperations.find(query, Document_.class);
    }
@@ -111,14 +128,14 @@ public class PhraseService {
     	Map<String, Integer> allDocumentsRepetations = new HashMap<String, Integer>();
     	Set<String> allPhraseStringsDocuments = new HashSet<String>();
     	List<Document_> allDocuments = getTermsDocuments(phraseStringsList);
-    	
+    	int QuerySize = new HashSet<>(phraseStringsList).size();
         /* Loop on all documents that have at least one term from the phrase 
          * and extract those which have all phrase terms (their Existence = Phrase Size) */
     	for(Document_ document : allDocuments) {
     		Object repVal = allDocumentsRepetations.get(document.getDocument());
     		int newVal = repVal == null ? 1 : (int) repVal + 1;
     		allDocumentsRepetations.put(document.getDocument(), newVal);
-    		if(newVal == phraseStringsList.size())
+    		if(newVal == QuerySize)
     			allPhraseStringsDocuments.add(document.getDocument());
     	}
     	

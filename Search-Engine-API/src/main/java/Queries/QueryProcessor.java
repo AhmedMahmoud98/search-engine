@@ -34,17 +34,22 @@ public final class QueryProcessor {
             if (s.startsWith("\"")){
                 phrase = true;
                 phraseWord = s.replaceAll("[^a-zA-Z0-9 ]", "");
+                if(s.endsWith("\"")) {
+                	phrase = false;
+                    queryProcessed.add(phraseWord);
+                    phraseWord = "";
+                }
                 continue;
             }
             if (phrase) {
-                phraseWord = phraseWord + " "+ s.replaceAll("[^a-zA-Z0-9 ]", "");
+                phraseWord = phraseWord + " " + s.replaceAll("[^a-zA-Z0-9 ]", "");
                 if (s.endsWith("\"")){
                     phrase = false;
                     queryProcessed.add(phraseWord);
                     phraseWord = "";
                 }
             }
-            else if (!stopWords.contains(s)) {
+            else if (!stopWords.contains(s.replaceAll("[^a-zA-Z0-9 ]", "").toLowerCase())) {
                 s = s.toLowerCase();
                 s = s.replaceAll("[^a-zA-Z0-9 ]", "");
                 stemmer.add(stringToChar(s), s.length());

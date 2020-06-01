@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import Models.Link;
 import Models.Page;
+import TextProcessing.StopWords;
 
 
 @Service
@@ -34,8 +35,8 @@ public class PageGenerationService {
 
 	    public List<Page> generatPages(List<String> Links, String Query) {
 	    	String[] query = Query.split("\\s+");
-	    	String queryTerm1 = query.length > 0 ? query[0].toLowerCase() : "";
-			String queryTerm2 = query.length > 1 ? query[1].toLowerCase() : "";
+	    	String queryTerm1 = query.length > 0 ? query[0].replaceAll("^\"|\"$", "").toLowerCase() : "";
+			String queryTerm2 = query.length > 1 ? query[1].replaceAll("^\"|\"$", "").toLowerCase() : "";
 			Link link;
 	    	List<Page> pages =  new ArrayList<Page>();
 	    	for(String linkURL: Links) {
