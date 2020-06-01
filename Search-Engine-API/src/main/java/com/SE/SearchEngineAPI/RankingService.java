@@ -30,9 +30,7 @@ public class RankingService {
         ArrayList<String> processed = QueryProcessor.process();
         List<Document_> docsPerTerm;
         double tfidf;
-        
-        long timeBefore = 0, timeAfter= 0, documentsTime = 0, sizeTime = 0, popTime = 0;
-        
+                
         Set<String> urls = new HashSet<>();
 
         ArrayList<Double> queryTFIDF = new ArrayList<>();
@@ -53,8 +51,8 @@ public class RankingService {
         for (int i = 0; i < processed.size(); i++){
             zeros.add(0.0);
         }
+        
         for (int i = 0; i < processed.size(); i++) {
-            timeBefore = System.currentTimeMillis();
             qWord = processed.get(i);
             if (qWord.split("\\s+").length > 1){
                 // Phrase Query
