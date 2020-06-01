@@ -31,12 +31,12 @@ public class ImagesService {
 		 QueryProcessor.setQuery(_query);
 	     List<String> queryStrings = QueryProcessor.process();
 	     List<TermImages> termImages = getTermsImages(queryStrings);
+	     Set<String> uniqueImages = new HashSet<String>();
 	     Set<Image> images = new HashSet<Image>();
-	     System.out.println(termImages.toString());
 	     for(TermImages termImage : termImages) {
 	    	 for(int i = 0;i < termImage.getImageUrl().length; i++)
-	    		 images.add(new Image(termImage.getImageUrl()[i],termImage.getWebsiteUrl()[0]));
-	    	 
+	    		 if (uniqueImages.add(termImage.getImageUrl()[i]))
+	    			 images.add(new Image(termImage.getImageUrl()[i],termImage.getWebsiteUrl()[0]));
 	     }
 	     
 	     return images.stream().collect(Collectors.toList());

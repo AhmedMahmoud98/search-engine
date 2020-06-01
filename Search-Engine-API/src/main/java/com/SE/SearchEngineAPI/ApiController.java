@@ -23,8 +23,6 @@ public class ApiController {
   @Autowired
   private VisitedUrlsService visitedUrlsService;
   @Autowired
-  private PhraseService phraseService;
-  @Autowired
   private PageGenerationService pageGenerationService;
   @Autowired
   private ImagesService imagesService;
