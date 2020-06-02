@@ -43,10 +43,10 @@ public class HTMLDocument {
 				DbManager dbManager = new DbManager();
 				dbManager.UpdateCrawler(docID, docTextP, title, termsSize);
 				
-			} catch (UnsupportedMimeTypeException | HttpStatusException | SocketTimeoutException e) {
+			} catch (Exception e) {
 				System.out.println("error fetching " + url);				/* Not a valid Url */
 			}
-		} catch (IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace(); 
 		}
 	}
