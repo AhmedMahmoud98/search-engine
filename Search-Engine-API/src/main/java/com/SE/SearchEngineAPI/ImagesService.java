@@ -36,7 +36,7 @@ public class ImagesService {
 	     for(TermImages termImage : termImages) {
 	    	 for(int i = 0;i < termImage.getImageUrl().length; i++)
 	    		 if (uniqueImages.add(termImage.getImageUrl()[i]))
-	    			 images.add(new Image(termImage.getImageUrl()[i],termImage.getWebsiteUrl()[0]));
+	    			 images.add(new Image(termImage.getImageUrl()[i],termImage.getWebsiteUrl()[i]));
 	     }
 	     return images.stream().collect(Collectors.toList());
 	}

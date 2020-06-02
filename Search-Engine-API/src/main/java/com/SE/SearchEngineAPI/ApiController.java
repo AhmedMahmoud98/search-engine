@@ -80,6 +80,20 @@ public class ApiController {
 			  							  @RequestParam String country,
 			  							  @RequestParam String pageNumber) {
 	  try {
+		  	long timeBefore = 0, timeAfter= 0, Time = 0;
+		  	CustomQuery _query = new CustomQuery(query, country, Integer.parseInt(pageNumber));
+		  	
+		  	timeBefore = System.currentTimeMillis();
+		    trendsService.extractTrends(_query);
+		    timeAfter = System.currentTimeMillis();
+		    Time = timeAfter - timeBefore;
+		    System.out.println("Trends Time: " + Time + " ms");
+		    
+		    timeBefore = System.currentTimeMillis();
+		    suggestionsService.saveSuggestion(query);
+		    timeAfter = System.currentTimeMillis();
+		    Time = timeAfter - timeBefore;
+		    System.out.println("Suggestions Time: " + Time + " ms");
 		    List<Image> imagesList = imagesService.getImages(query);
 		    if (imagesList.isEmpty()) {
 		      return new ResponseEntity<>(HttpStatus.NO_CONTENT);
