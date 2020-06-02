@@ -39,6 +39,7 @@ public class PageGenerationService {
 			String queryTerm2 = query.length > 1 ? query[1].replaceAll("^\"|\"$", "").toLowerCase() : "";
 			Link link;
 	    	List<Page> pages =  new ArrayList<Page>();
+
 	    	for(String linkURL: Links) {
 	    		link = getLinkData(linkURL);
 	    		pages.add(new Page(link.getLinkURL(),link.getTitle(),this.getSummary(link.getText(), queryTerm1, queryTerm2)));
@@ -67,6 +68,7 @@ public class PageGenerationService {
 			
 	    	firstParagraphFirstIndex = linkText.indexOf(queryTerm1);
 			firstParagraphLastIndex = linkText.indexOf(" ", firstParagraphFirstIndex + 80);
+			firstParagraphLastIndex = firstParagraphLastIndex == -1 ? linkText.length() : firstParagraphLastIndex;
 			
 			if(firstParagraphFirstIndex != -1)
 				summary = linkText.substring(firstParagraphFirstIndex, Math.min(firstParagraphLastIndex, linkText.length())) + "... ";
@@ -74,10 +76,12 @@ public class PageGenerationService {
 			if(! queryTerm2.equals("")) {
 				secondParagraphFirstIndex = linkText.indexOf(queryTerm2);
 				secondParagraphLastIndex = linkText.indexOf(" ", secondParagraphFirstIndex + 80);
+				secondParagraphLastIndex = secondParagraphLastIndex == -1 ? linkText.length() : secondParagraphLastIndex;
 			}
 			else {
 				secondParagraphFirstIndex = linkText.indexOf(queryTerm1, firstParagraphLastIndex + 1);
 				secondParagraphLastIndex = linkText.indexOf(" ", secondParagraphFirstIndex + 80);
+				secondParagraphLastIndex = secondParagraphLastIndex == -1 ? linkText.length() : secondParagraphLastIndex;
 			}
 			
 			if(secondParagraphFirstIndex != -1)

@@ -52,6 +52,10 @@ public class ApiController {
 			timeAfter = System.currentTimeMillis();
 		    Time = timeAfter - timeBefore;
 		    System.out.println("Ranking Time: " + Time + " ms");
+		    
+		    if (sortedLinks.isEmpty()) {
+			      return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+			 }
 	
 			timeBefore = System.currentTimeMillis();
 			int sizeOfPage = 10;
@@ -63,10 +67,6 @@ public class ApiController {
 		  	timeAfter = System.currentTimeMillis();
 		    Time = timeAfter - timeBefore;
 		    System.out.println("Paging Time: " + Time + " ms");
-
-		    if (pagesList.isEmpty()) {
-		      return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-		    }
 
 		    return new ResponseEntity<>(pages, HttpStatus.OK);
 		  } catch (Exception e) {
@@ -80,10 +80,11 @@ public class ApiController {
 			  							  @RequestParam String country,
 			  							  @RequestParam String pageNumber) {
 	  try {
-
 		    List<Image> imagesList = imagesService.getImages(query);
-		    System.out.println(imagesList);
-		    System.out.println("empty");
+		    if (imagesList.isEmpty()) {
+		      return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+		    }
+		    
 		    int sizeOfPage = 20;
 		    int fromIdx = (Integer.parseInt(pageNumber) - 1) * sizeOfPage;
 		    int toIdx = Math.min(fromIdx + sizeOfPage, imagesList.size());
@@ -91,6 +92,7 @@ public class ApiController {
 		    Images images = new Images(imagesList.subList(fromIdx, toIdx), imagesList.size());
 
 		    if (imagesList.isEmpty()) {
+		    	System.out.println("Hello");
 		      return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 		    }
 		    return new ResponseEntity<>(images, HttpStatus.OK);

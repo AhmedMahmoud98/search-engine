@@ -3,6 +3,8 @@ package com.SE.SearchEngineAPI;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -50,19 +52,26 @@ public class PhraseService {
     }
     
     public  List<Document_>  handleDuplicates(List<Document_> termsDocumentsEntries, List<String> phraseStringsList) {
+    	List<Document_> dupDocuments = new ArrayList<Document_>();
     	Set<String> duplicates = new HashSet<>();
     	Set<String> uniques = new HashSet<>();
-
-    	List<Document_> dupDocuments = new ArrayList<Document_>();
+    	boolean dupFound = false;
+    	
     	for(String term: phraseStringsList)
     		if (!uniques.add(term))
     			duplicates.add(term);
-   
-		for(Document_ document: termsDocumentsEntries)
-			if(duplicates.contains(document.getTerm()))
-				dupDocuments.add(document);
-		
-		termsDocumentsEntries.addAll(dupDocuments);
+    	
+    	dupFound = !duplicates.isEmpty();
+    	if(dupFound)
+    	{
+			for(Document_ document: termsDocumentsEntries)
+				if(duplicates.contains(document.getTerm()))
+					dupDocuments.add(document);
+			
+			termsDocumentsEntries.addAll(dupDocuments);
+			Collections.sort(termsDocumentsEntries);
+    	}
+    	
     	return termsDocumentsEntries;
     }
     
@@ -87,9 +96,10 @@ public class PhraseService {
         for (String term : terms) 
        		 OR.add(new Criteria().and("term").is(term));
          
-        if(OR != null)
-       	 query.addCriteria(new Criteria().orOperator(OR.toArray(new Criteria[OR.size()])))
-       	 .fields().include("document").include("term"); 
+        if(OR.isEmpty())	return new ArrayList<Document_>();
+        
+       	query.addCriteria(new Criteria().orOperator(OR.toArray(new Criteria[OR.size()])))
+       	.fields().include("document").include("term"); 
 
        return this.mongoOperations.find(query, Document_.class);
    }
@@ -102,7 +112,7 @@ public class PhraseService {
 	    	 for(String document: documents)
 	    		 OR.add(new Criteria().and("term").is(term).and("document").is(document));
 	      
-	     if(OR.isEmpty())	return new ArrayList<>();
+	     if(OR.isEmpty())	return new ArrayList<Document_>();
 
 	     query.with(Sort.by(Sort.Direction.ASC, "document"))
 	    	 .addCriteria(new Criteria().orOperator(OR.toArray(new Criteria[OR.size()])))
@@ -157,7 +167,7 @@ public class PhraseService {
          * the terms positions in each document, we can indicate if this document has the phrase */
         int termsDocumentsIterator = 0;
         int tempIterator = 0;
-        for (int documentsIterator = 0; documentsIterator < DocumentsSize; documentsIterator++) {	
+        for (int documentsIterator = 0; documentsIterator < DocumentsSize; documentsIterator++) {
         	for (int termsIterator = 0; termsIterator < QuerySize; termsIterator++) {
         		for (int termsIterator2 = 0; termsIterator2 < QuerySize; termsIterator2++)
         		{

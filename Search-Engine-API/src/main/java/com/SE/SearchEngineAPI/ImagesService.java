@@ -38,7 +38,6 @@ public class ImagesService {
 	    		 if (uniqueImages.add(termImage.getImageUrl()[i]))
 	    			 images.add(new Image(termImage.getImageUrl()[i],termImage.getWebsiteUrl()[0]));
 	     }
-	     
 	     return images.stream().collect(Collectors.toList());
 	}
 	
@@ -48,11 +47,13 @@ public class ImagesService {
 	        List<Criteria> OR = new ArrayList<>();
 	        for (String term : queryStrings) 
 	       		 OR.add(new Criteria().and("term").is(term));
-	         
-	        if(OR != null)
-	       	 query.addCriteria(new Criteria().orOperator(OR.toArray(new Criteria[OR.size()])))
-	       	 .fields().exclude("term"); 
+	        
+	        if(OR.isEmpty())
+	        	return new ArrayList<TermImages>();
 
+	       query.addCriteria(new Criteria().orOperator(OR.toArray(new Criteria[OR.size()])))
+	       	.fields().exclude("term"); 
+	        
 	       return this.mongoOperations.find(query, TermImages.class);	
 	}
 

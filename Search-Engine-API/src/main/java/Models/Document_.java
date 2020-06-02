@@ -6,7 +6,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "Document")
-public class Document_ {
+public class Document_ implements Comparable<Document_> {
 	  private String term;
 	  private String document;
 	  private double termFrequency;
@@ -70,8 +70,12 @@ public class Document_ {
 		return "Document_ [term=" + term + ", document=" + document + ", termFrequency=" + termFrequency
 				+ ", positions=" + Arrays.toString(positions) + ", inTitle=" + inTitle + "]";
 	}
+	
+	@Override
+    public int compareTo(Document_ o) {
+         return this.getDocument().compareTo(((Document_) o).getDocument());
+    }
 
-	  
-
-	}
+	
+}
 
