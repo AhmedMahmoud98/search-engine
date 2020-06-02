@@ -32,7 +32,7 @@ public class RankingService {
         double tfidf;
                 
         Set<String> urls = new HashSet<>();
-
+        Set<String> phraseUrls = new HashSet<>();
         ArrayList<Double> queryTFIDF = new ArrayList<>();
         tfidf = 1.0 / processed.size();
         for (int k=0; k < processed.size(); k++){
@@ -47,7 +47,7 @@ public class RankingService {
         String doc;
         Map<String, Double> phraseTemp;
         PhraseService phServ = new PhraseService(this.mongoOperations);
-
+        boolean phraseExists = false;
         for (int i = 0; i < processed.size(); i++){
             zeros.add(0.0);
         }
@@ -58,14 +58,16 @@ public class RankingService {
                 // Phrase Query
 
                 phraseTemp = phServ.phraseQuery(qWord);
+                phraseExists = phraseExists || (phraseTemp.keySet().size() > 0);
                 for (String url : phraseTemp.keySet()){
                     urls.add(url);
+                    phraseUrls.add(url);
                     if (rankings.get(url) == null) {
                         temp = new ArrayList<>(zeros);
                         rankings.put(url, temp);
                     }
                     temp = rankings.get(url);
-                    temp.set(i, phraseTemp.get(url));
+                    temp.set(i, 10 + phraseTemp.get(url));
                 }
             }
             else {
