@@ -200,8 +200,8 @@ public class CrawlerController implements Runnable {
 			try {
 				document = Jsoup.connect(INITIAL_SEEDS.get(i)).get();
 				SEEDS.add(new SeedsObject(INITIAL_SEEDS.get(i),document.body().text()));
-			} catch (IOException e) {
-				
+			} catch (Exception e) {
+				System.out.println("error fetching " + INITIAL_SEEDS.get(i));	
 			}
 		}
 		SaveSeeds();
@@ -394,9 +394,8 @@ class Crawler implements Runnable {
 				}
 			}
 
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch (Exception e) {
+			System.out.println("error fetching " + URL);	
 		}
 		// }
 
