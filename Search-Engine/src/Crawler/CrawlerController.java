@@ -363,6 +363,13 @@ class Crawler implements Runnable {
 					toBeAddedUrl = toBeAddedUrl.substring(0, toBeAddedUrl.length() - 1);
 
 				}
+				if(toBeAddedUrl.contains("=")) {
+		    		int indexOfTrim = toBeAddedUrl.indexOf("?");
+		    		if(indexOfTrim>1) {
+		    			toBeAddedUrl = toBeAddedUrl.substring(0, indexOfTrim-1);
+		    		}
+		    		
+		    	}
 				//To Check If The Content is Html page 
 				
 				if(toBeAddedUrl.contains("png")||toBeAddedUrl.contains("jpg")||toBeAddedUrl.contains("svg")||toBeAddedUrl.contains("jpeg")||toBeAddedUrl.contains("pdf")) {
