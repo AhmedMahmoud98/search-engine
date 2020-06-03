@@ -24,7 +24,7 @@ public class SuggestionsService {
 	}
 
     public void saveSuggestion(String _query) {
-    	  Suggestion suggestion = mongoOperations.findAndModify(query(where("searchString").is(_query.toLowerCase())),
+    	  	mongoOperations.findAndModify(query(where("searchString").is(_query.toLowerCase())),
     	                 new Update().inc("frequency",1), options().returnNew(true).upsert(true),Suggestion.class);
     }
 }

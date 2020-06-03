@@ -1,14 +1,11 @@
 package Main;
 import java.io.IOException;
-import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
 
 import Crawler.CrawlerController;
 import DB.DbManager;
 import Indexer.Indexer;
-import Indexer.IndexerThread;
 import Ranker.PageRank;
 
 import java.util.logging.Level;

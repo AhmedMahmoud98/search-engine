@@ -1,12 +1,6 @@
 package com.SE.SearchEngineAPI;
 
-import static org.springframework.data.mongodb.core.FindAndModifyOptions.options;
-import static org.springframework.data.mongodb.core.query.Criteria.where;
-import static org.springframework.data.mongodb.core.query.Query.query;
-
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,8 +13,6 @@ import org.springframework.stereotype.Service;
 
 import Models.Link;
 import Models.Page;
-import TextProcessing.StopWords;
-
 
 @Service
 public class PageGenerationService {
@@ -49,7 +41,8 @@ public class PageGenerationService {
 	    	
 	    }
 	    
-	    public Link getLinkData(String link) {
+	    @SuppressWarnings("static-access")
+		public Link getLinkData(String link) {
 	    	Query query = new Query();
 	        Criteria c = new Criteria().where("linkURL").is(link); 
 	        query.addCriteria(c).fields().include("title").include("text").include("linkURL"); ;

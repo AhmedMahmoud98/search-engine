@@ -1,9 +1,7 @@
 package Indexer;
 import DB.DbManager;
 
-import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
-import org.jsoup.UnsupportedMimeTypeException;
 import org.jsoup.nodes.Document;
 
 import TextProcessing.Stemmer;
@@ -11,9 +9,6 @@ import TextProcessing.StopWords;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import java.io.IOException;
-import java.net.SocketTimeoutException;
-import java.net.URL;
 import java.util.*;
 import java.util.stream.Collectors;
 

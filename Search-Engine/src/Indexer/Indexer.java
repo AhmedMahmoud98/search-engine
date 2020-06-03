@@ -1,14 +1,9 @@
 package Indexer;
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Scanner;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import Crawler.CrawlerController;
 import DB.DbManager;
 
 public class Indexer implements Runnable {
@@ -35,7 +30,6 @@ public class Indexer implements Runnable {
 		} catch (InterruptedException | IOException e) {
 			e.printStackTrace();
 		}
-		
 	}
 
     public void constructIndex() throws InterruptedException, IOException {

@@ -6,7 +6,6 @@ import com.mongodb.*;
 import com.mongodb.client.*;
 import com.mongodb.client.model.Indexes;
 import com.mongodb.client.model.Projections;
-import com.mongodb.client.result.UpdateResult;
 
 import static com.mongodb.client.model.Filters.*;
 
@@ -15,10 +14,7 @@ import Crawler.CrawlerObject;
 import Crawler.SeedsObject;
 import Indexer.termDocumentKey;
 
-
-
 import java.util.*;
-
 
 /* Singleton Pattern */
 public class DbManager {
@@ -26,7 +22,8 @@ public class DbManager {
     private DB database;
     private static DbManager instance;
     
-    private DbManager() { 
+    @SuppressWarnings("deprecation")
+	private DbManager() { 
   	
         /* Initialize default connection */
         mongoClient = new MongoClient();

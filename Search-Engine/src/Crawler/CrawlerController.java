@@ -461,8 +461,6 @@ class Crawler implements Runnable {
 				URLConnection urlcon = url.openConnection();
 				InputStream stream = urlcon.getInputStream();
 			
-					
-				
 				Scanner sc = new Scanner(stream);
 				boolean foundUser = false;
 
