@@ -1,5 +1,6 @@
 How to Run:
 
+You can find the search-engine-ui project repo here: https://github.com/AhmedMahmoud98/search-engine-ui
 -------------- Run search-engine-user-interface -----------------
 
 1) install Nodejs
@@ -27,7 +28,7 @@ How to Run:
 - Open Eclipse IDE
 - Click file -> Import
 - Choose Maven -> Existing Maven Project
-- Choose The Project Folder "Search-Engine-API"
+- Choose The Project Folder "Search-Engine-API" (Eclipse will Download some dependencies at first)
 
 3) Run The project from Class "SearchEngineApiApplication"
 

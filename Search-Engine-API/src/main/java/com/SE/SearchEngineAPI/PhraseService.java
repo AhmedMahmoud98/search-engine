@@ -1,9 +1,6 @@
 package com.SE.SearchEngineAPI;
 
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -121,7 +118,8 @@ public class PhraseService {
 	    return this.mongoOperations.find(query, Document_.class);
     }
 
-    public List<Link> getDocumentsSizes(String document){
+    @SuppressWarnings("static-access")
+	public List<Link> getDocumentsSizes(String document){
         Query query = new Query();
         Criteria c = new Criteria().where("linkURL").is(document); 
         query.addCriteria(c).fields().include("linkURL").include("textSize");

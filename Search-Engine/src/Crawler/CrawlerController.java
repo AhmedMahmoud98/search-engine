@@ -10,7 +10,6 @@ import com.mongodb.DBObject;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -57,9 +56,16 @@ public class CrawlerController implements Runnable {
 		//INITIAL_SEEDS.add("https://www.geeksforgeeks.org/greedy-algorithms");
 		INITIAL_SEEDS.add("https://www.nytimes.com/");
 		INITIAL_SEEDS.add("https://www.techiedelight.com/");
+
 		//INITIAL_SEEDS.add("https://www.kingfut.com/");
 		//INITIAL_SEEDS.add("https://www.skysports.com/football/news");
 		//INITIAL_SEEDS.add("https://en.wikipedia.org/wiki/Computer_science");
+		INITIAL_SEEDS.add("https://www.geeksforgeeks.org/greedy-algorithms");
+		INITIAL_SEEDS.add("https://www.fandango.com/famous-actors-and-actresses");
+		//INITIAL_SEEDS.add("https://www.mirror.co.uk/sport/football/news/");
+		INITIAL_SEEDS.add("https://www.techiedelight.com/");
+		INITIAL_SEEDS.add("https://www.kingfut.com/");
+
 		//INITIAL_SEEDS.add("https://www.geeksforgeeks.org/computer-network-tutorials");
 		//INITIAL_SEEDS.add("https://www.premierleague.com/news");
 		//INITIAL_SEEDS.add("https://www.premierleague.com/players");
@@ -393,6 +399,7 @@ class Crawler implements Runnable {
 					AddRefer(page.attr("abs:href"));
 					if (checkRobot && !CheckExist(toBeAddedUrl)
 							&& links.size() < CrawlerController.NUMBER_OF_WEBSITES ) {
+
 						CrawlerObject toBeAdded = new CrawlerObject();
 						toBeAdded.setLinkURL(toBeAddedUrl);
 						links.add(toBeAdded);
@@ -467,8 +474,6 @@ class Crawler implements Runnable {
 				URLConnection urlcon = url.openConnection();
 				InputStream stream = urlcon.getInputStream();
 			
-					
-				
 				Scanner sc = new Scanner(stream);
 				boolean foundUser = false;
 

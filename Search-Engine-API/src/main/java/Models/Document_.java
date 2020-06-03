@@ -2,7 +2,6 @@ package Models;
 
 import java.util.Arrays;
 
-import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "Document")
@@ -75,7 +74,5 @@ public class Document_ implements Comparable<Document_> {
     public int compareTo(Document_ o) {
          return this.getDocument().compareTo(((Document_) o).getDocument());
     }
-
-	
 }
 

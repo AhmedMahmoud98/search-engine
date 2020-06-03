@@ -7,7 +7,6 @@ import static org.springframework.data.mongodb.core.query.Query.query;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
 import java.util.List;
 
 import Models.*;
@@ -18,7 +17,6 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
-
 
 import opennlp.tools.namefind.NameFinderME;
 import opennlp.tools.namefind.TokenNameFinderModel;
@@ -59,13 +57,15 @@ public class TrendsService {
     	        if(index != Name.getEnd() - 1)
     	        	extractedName += " ";
     	    }
-    	    Trend trend = mongoOperations.findAndModify(query(where("trendName").is(extractedName).and("country").is(query.getUserLocation())),
+    	    
+    	    mongoOperations.findAndModify(query(where("trendName").is(extractedName).and("country").is(query.getUserLocation())),
     	                  new Update().inc("frequency",1), options().returnNew(true).upsert(true),Trend.class);
     	    extractedName = "";
     	}
     }
     
-    public List<Trend> getTrends(String country) {
+    @SuppressWarnings("static-access")
+	public List<Trend> getTrends(String country) {
     	  Query query = new Query();
     	  Criteria c = new Criteria().where("country").is(country); 
     	  query.with(Sort.by(Sort.Direction.DESC, "frequency"))

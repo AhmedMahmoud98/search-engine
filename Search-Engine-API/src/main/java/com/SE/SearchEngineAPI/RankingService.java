@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class RankingService {
-    private CustomQuery query;
     private MongoOperations mongoOperations;
 
     @Autowired
