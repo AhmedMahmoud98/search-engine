@@ -40,7 +40,7 @@ public class HTMLDocument {
 				parseImages(doc);
 				int termsSize = setTerms(docText , title);
 				
-				DbManager dbManager = new DbManager();
+				DbManager dbManager = DbManager.getInstance();
 				dbManager.UpdateCrawler(docID, docTextP, title, termsSize);
 				
 			} catch (Exception e) {
@@ -114,7 +114,7 @@ public class HTMLDocument {
 			}
 
 		}
-		DbManager dbManager = new DbManager();
+		DbManager dbManager = DbManager.getInstance();
 		dbManager.saveImageCollection(imageTerms , url);
 	}
 
