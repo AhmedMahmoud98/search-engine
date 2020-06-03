@@ -114,6 +114,7 @@ public class HTMLDocument {
 			}
 
 		}
+
 		DbManager dbManager = DbManager.getInstance();
 		dbManager.saveImageCollection(imageTerms , url);
 	}

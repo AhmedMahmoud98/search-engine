@@ -2,6 +2,7 @@ package Models;
 
 import java.util.List;
 
+
 public class Images {
 	private List<Image> images;
 	private int size;
@@ -30,5 +31,4 @@ public class Images {
 	public void setSize(int size) {
 		this.size = size;
 	}
-
 }

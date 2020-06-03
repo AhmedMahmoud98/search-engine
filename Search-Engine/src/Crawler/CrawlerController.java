@@ -10,7 +10,6 @@ import com.mongodb.DBObject;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -54,10 +53,15 @@ public class CrawlerController implements Runnable {
 		LINKS = new ArrayList<CrawlerObject>();
 		INITIAL_SEEDS = new ArrayList<String>();
 		//////////////////////////////////////Initial Seeds for Crawling///////////////////////////////////////////////////////////////////
-		//INITIAL_SEEDS.add("https://www.geeksforgeeks.org/greedy-algorithms");
-		INITIAL_SEEDS.add("https://www.techiedelight.com/");
+
 		//INITIAL_SEEDS.add("https://www.kingfut.com/");
 		//INITIAL_SEEDS.add("https://en.wikipedia.org/wiki/Computer_science");
+		INITIAL_SEEDS.add("https://www.geeksforgeeks.org/greedy-algorithms");
+		INITIAL_SEEDS.add("https://www.fandango.com/famous-actors-and-actresses");
+		//INITIAL_SEEDS.add("https://www.mirror.co.uk/sport/football/news/");
+		INITIAL_SEEDS.add("https://www.techiedelight.com/");
+		INITIAL_SEEDS.add("https://www.kingfut.com/");
+
 		//INITIAL_SEEDS.add("https://www.geeksforgeeks.org/computer-network-tutorials");
 		// Loading Previous State Of The Crawler From DataBase
 		GetCrawledLinks();
@@ -383,8 +387,11 @@ class Crawler implements Runnable {
 
 				synchronized (links) {
 					AddRefer(page.attr("abs:href"));
+					System.out.println(page.attr("abs:href"));
+					System.out.println(links.size());
 					if (CheckRobots(page.attr("abs:href")) && !CheckExist(toBeAddedUrl)
 							&& links.size() < CrawlerController.NUMBER_OF_WEBSITES ) {
+
 						CrawlerObject toBeAdded = new CrawlerObject();
 						toBeAdded.setLinkURL(toBeAddedUrl);
 						links.add(toBeAdded);

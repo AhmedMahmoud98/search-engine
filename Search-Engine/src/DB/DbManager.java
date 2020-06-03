@@ -26,8 +26,8 @@ public class DbManager {
     private DB database;
     private static DbManager instance;
     
-    private DbManager(){
-    	
+    private DbManager() { 
+  	
         /* Initialize default connection */
         mongoClient = new MongoClient();
         database = mongoClient.getDB("SearchEngine");
@@ -176,13 +176,11 @@ public class DbManager {
                     .append("inTitle" , inTtitle);
             entries.add(entry);
         }
-        try {
-        if(!entries.isEmpty())
-        	collection.insert(entries);
-        }
-        catch(Exception e) {
-        	
-        }
+        	 try {
+        	       if(!entries.isEmpty())
+        	        	collection.insert(entries);
+    	        } catch(Exception e) {}
+
     }
     
     public void saveImageCollection(Map<String,List<String>> terms, String url){
