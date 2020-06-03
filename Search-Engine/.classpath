@@ -6,7 +6,7 @@
 			<attribute name="module" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="/home/afifi/3rd Year/2021/2nd Term/Advanced Programming Techniques/project/search-engine/jsoup-1.13.1.jar"/>
-	<classpathentry kind="lib" path="/home/afifi/3rd Year/2021/2nd Term/Advanced Programming Techniques/project/search-engine/mongo-java-driver-3.12.3.jar"/>
+	<classpathentry exported="true" kind="lib" path="/home/aly/Study/APT/search-engine/Search-Engine/lib/jsoup-1.13.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="/home/aly/Study/APT/search-engine/Search-Engine/lib/mongo-java-driver-3.12.3.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

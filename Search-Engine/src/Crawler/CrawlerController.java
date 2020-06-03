@@ -367,14 +367,16 @@ class Crawler implements Runnable {
 			for (Element page : linksOnPage) {
 				//To Check If 2 differinets   urls have the same website link 
 				String toBeAddedUrl = page.attr("abs:href");
-				if(toBeAddedUrl.contains("#")) {
-					toBeAddedUrl = toBeAddedUrl.split("/#")[0];
-		    		
-		    	}
+				
 				if (toBeAddedUrl.endsWith("/")) {
 					toBeAddedUrl = toBeAddedUrl.substring(0, toBeAddedUrl.length() - 1);
 
 				}
+				if(toBeAddedUrl.contains("#")) {
+					int index = toBeAddedUrl.lastIndexOf("/");
+					toBeAddedUrl = toBeAddedUrl.substring(0,index);
+		    		
+		    	}
 				if(toBeAddedUrl.contains("=")) {
 		    		int indexOfTrim = toBeAddedUrl.indexOf("?");
 		    		if(indexOfTrim>1) {
