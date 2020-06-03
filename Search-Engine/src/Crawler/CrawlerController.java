@@ -55,10 +55,14 @@ public class CrawlerController implements Runnable {
 		INITIAL_SEEDS = new ArrayList<String>();
 		//////////////////////////////////////Initial Seeds for Crawling///////////////////////////////////////////////////////////////////
 		//INITIAL_SEEDS.add("https://www.geeksforgeeks.org/greedy-algorithms");
+		INITIAL_SEEDS.add("https://www.nytimes.com/");
 		INITIAL_SEEDS.add("https://www.techiedelight.com/");
 		//INITIAL_SEEDS.add("https://www.kingfut.com/");
+		//INITIAL_SEEDS.add("https://www.skysports.com/football/news");
 		//INITIAL_SEEDS.add("https://en.wikipedia.org/wiki/Computer_science");
 		//INITIAL_SEEDS.add("https://www.geeksforgeeks.org/computer-network-tutorials");
+		//INITIAL_SEEDS.add("https://www.premierleague.com/news");
+		//INITIAL_SEEDS.add("https://www.premierleague.com/players");
 		// Loading Previous State Of The Crawler From DataBase
 		GetCrawledLinks();
 		GetRobots();
@@ -380,26 +384,35 @@ class Crawler implements Runnable {
 				}
 				
 				//Start Adding to Database and Links 
+				boolean checkRobot = false ;
+				boolean reachedThousand = false;
+				
+				checkRobot = CheckRobots(page.attr("abs:href"));
 
 				synchronized (links) {
 					AddRefer(page.attr("abs:href"));
-					if (CheckRobots(page.attr("abs:href")) && !CheckExist(toBeAddedUrl)
+					if (checkRobot && !CheckExist(toBeAddedUrl)
 							&& links.size() < CrawlerController.NUMBER_OF_WEBSITES ) {
 						CrawlerObject toBeAdded = new CrawlerObject();
 						toBeAdded.setLinkURL(toBeAddedUrl);
 						links.add(toBeAdded);
+						System.out.println(links.size());
 						CrawlerController.NUM_OF_K_DOCUMENTS = CrawlerController.NUM_OF_K_DOCUMENTS + 1;
-
 						synchronized (CrawlerController.SYNCHRONIZATION) {
 							if(CrawlerController.NUM_OF_K_DOCUMENTS >= 1000) {
-								CrawlerController.SaveLinks();
-								CrawlerController.SaveRobots();
+								
 								CrawlerController.NUM_OF_K_DOCUMENTS = 0;
 								CrawlerController.SYNCHRONIZATION.incrementAndGet();
 								CrawlerController.SYNCHRONIZATION.notifyAll();
+								reachedThousand=true;
 							}
 						}
+
 					}
+				}
+				if(reachedThousand) {
+				CrawlerController.SaveLinks();
+				CrawlerController.SaveRobots();
 				}
 			}
 
@@ -466,7 +479,7 @@ class Crawler implements Runnable {
 						foundUser = true;
 
 					} else if (foundUser) {
-						if (line.contains("User-agent")) {
+						if (line.contains("User-agent")|| line.contains("User-agent:")||line.contains("User-Agent:")||line.contains("User-Agent")) {
 							break;
 						}
 						String[] slashes = line.split(" ");

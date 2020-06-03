@@ -27,7 +27,7 @@ public class Main {
 		
         AtomicInteger synchronization = new AtomicInteger();
 
-        CrawlerController _crawler = new CrawlerController(10, 3000, synchronization);
+        CrawlerController _crawler = new CrawlerController(10, 5000, synchronization);
         Thread crawler = new Thread(_crawler);
         crawler.start();
         Indexer _indexer = new Indexer(synchronization);
