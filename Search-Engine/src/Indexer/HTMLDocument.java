@@ -40,13 +40,13 @@ public class HTMLDocument {
 				parseImages(doc);
 				int termsSize = setTerms(docText , title);
 				
-				DbManager dbManager = new DbManager();
+				DbManager dbManager = DbManager.getInstance();
 				dbManager.UpdateCrawler(docID, docTextP, title, termsSize);
 				
-			} catch (UnsupportedMimeTypeException | HttpStatusException | SocketTimeoutException e) {
+			} catch (Exception e) {
 				System.out.println("error fetching " + url);				/* Not a valid Url */
 			}
-		} catch (IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace(); 
 		}
 	}
@@ -114,7 +114,7 @@ public class HTMLDocument {
 			}
 
 		}
-		DbManager dbManager = new DbManager();
+		DbManager dbManager = DbManager.getInstance();
 		dbManager.saveImageCollection(imageTerms , url);
 	}
 

@@ -26,6 +26,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import DB.*;
 
 // JAR File is added to ClassPath in Libraries and marked true on order and export 
+//mongod --dbpath diskvar/lib/mongo --logpath diskvar/log/mongod.log --fork
 
 //mongod --dbpath /var/lib/mongo --logpath /var/log/mongodb/mongod.log --fork
 
@@ -54,8 +55,9 @@ public class CrawlerController implements Runnable {
 		INITIAL_SEEDS = new ArrayList<String>();
 		//////////////////////////////////////Initial Seeds for Crawling///////////////////////////////////////////////////////////////////
 		//INITIAL_SEEDS.add("https://www.geeksforgeeks.org/greedy-algorithms");
-		//INITIAL_SEEDS.add("https://www.techiedelight.com/");
-		INITIAL_SEEDS.add("https://www.kingfut.com/");
+		INITIAL_SEEDS.add("https://www.techiedelight.com/");
+		//INITIAL_SEEDS.add("https://www.kingfut.com/");
+		//INITIAL_SEEDS.add("https://en.wikipedia.org/wiki/Computer_science");
 		//INITIAL_SEEDS.add("https://www.geeksforgeeks.org/computer-network-tutorials");
 		// Loading Previous State Of The Crawler From DataBase
 		GetCrawledLinks();
