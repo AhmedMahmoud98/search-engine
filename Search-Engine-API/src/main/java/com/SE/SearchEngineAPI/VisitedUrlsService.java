@@ -2,6 +2,7 @@ package com.SE.SearchEngineAPI;
 
 import static org.springframework.data.mongodb.core.FindAndModifyOptions.options;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import Models.Popularity;
