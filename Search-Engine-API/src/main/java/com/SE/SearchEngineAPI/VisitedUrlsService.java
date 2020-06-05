@@ -1,10 +1,7 @@
 package com.SE.SearchEngineAPI;
 
 import static org.springframework.data.mongodb.core.FindAndModifyOptions.options;
-import static org.springframework.data.mongodb.core.query.Criteria.where;
-import static org.springframework.data.mongodb.core.query.Query.query;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import Models.Popularity;
@@ -15,8 +12,6 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
-
-import com.mongodb.client.result.UpdateResult;
 
 import Models.VisitedUrl;
 import Queries.QueryProcessor;

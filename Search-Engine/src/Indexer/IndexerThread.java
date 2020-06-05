@@ -127,14 +127,12 @@ public class IndexerThread implements Runnable {
 		DBManager.saveDocumentCollection(termDocumentDictionary, documentsSizes);
 	}
 	
-    public static boolean isValid(String url) 
+    public boolean isValid(String url) 
     { 
         try { 
             new URL(url).toURI(); 
             return true; 
-        } 
-          
-        catch (Exception e) { 
+        }  catch (Exception e) { 
             return false; 
         } 
     } 

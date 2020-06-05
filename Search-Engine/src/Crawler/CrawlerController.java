@@ -10,7 +10,6 @@ import com.mongodb.DBObject;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -26,6 +25,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import DB.*;
 
 // JAR File is added to ClassPath in Libraries and marked true on order and export 
+//mongod --dbpath diskvar/lib/mongo --logpath diskvar/log/mongod.log --fork
 
 //mongod --dbpath /var/lib/mongo --logpath /var/log/mongodb/mongod.log --fork
 
@@ -54,9 +54,21 @@ public class CrawlerController implements Runnable {
 		INITIAL_SEEDS = new ArrayList<String>();
 		//////////////////////////////////////Initial Seeds for Crawling///////////////////////////////////////////////////////////////////
 		//INITIAL_SEEDS.add("https://www.geeksforgeeks.org/greedy-algorithms");
-		//INITIAL_SEEDS.add("https://www.techiedelight.com/");
+		INITIAL_SEEDS.add("https://www.nytimes.com/");
+		INITIAL_SEEDS.add("https://www.techiedelight.com/");
+
+		//INITIAL_SEEDS.add("https://www.kingfut.com/");
+		//INITIAL_SEEDS.add("https://www.skysports.com/football/news");
+		//INITIAL_SEEDS.add("https://en.wikipedia.org/wiki/Computer_science");
+		INITIAL_SEEDS.add("https://www.geeksforgeeks.org/greedy-algorithms");
+		INITIAL_SEEDS.add("https://www.fandango.com/famous-actors-and-actresses");
+		//INITIAL_SEEDS.add("https://www.mirror.co.uk/sport/football/news/");
+		INITIAL_SEEDS.add("https://www.techiedelight.com/");
 		INITIAL_SEEDS.add("https://www.kingfut.com/");
+
 		//INITIAL_SEEDS.add("https://www.geeksforgeeks.org/computer-network-tutorials");
+		//INITIAL_SEEDS.add("https://www.premierleague.com/news");
+		//INITIAL_SEEDS.add("https://www.premierleague.com/players");
 		// Loading Previous State Of The Crawler From DataBase
 		GetCrawledLinks();
 		GetRobots();
@@ -200,8 +212,8 @@ public class CrawlerController implements Runnable {
 			try {
 				document = Jsoup.connect(INITIAL_SEEDS.get(i)).get();
 				SEEDS.add(new SeedsObject(INITIAL_SEEDS.get(i),document.body().text()));
-			} catch (IOException e) {
-				
+			} catch (Exception e) {
+				System.out.println("error fetching " + INITIAL_SEEDS.get(i));	
 			}
 		}
 		SaveSeeds();
@@ -355,14 +367,23 @@ class Crawler implements Runnable {
 			for (Element page : linksOnPage) {
 				//To Check If 2 differinets   urls have the same website link 
 				String toBeAddedUrl = page.attr("abs:href");
-				if(toBeAddedUrl.contains("#")) {
-					toBeAddedUrl = toBeAddedUrl.split("/#")[0];
-		    		
-		    	}
+				
 				if (toBeAddedUrl.endsWith("/")) {
 					toBeAddedUrl = toBeAddedUrl.substring(0, toBeAddedUrl.length() - 1);
 
 				}
+				if(toBeAddedUrl.contains("#")) {
+					int index = toBeAddedUrl.lastIndexOf("/");
+					toBeAddedUrl = toBeAddedUrl.substring(0,index);
+		    		
+		    	}
+				if(toBeAddedUrl.contains("=")) {
+		    		int indexOfTrim = toBeAddedUrl.indexOf("?");
+		    		if(indexOfTrim>1) {
+		    			toBeAddedUrl = toBeAddedUrl.substring(0, indexOfTrim-1);
+		    		}
+		    		
+		    	}
 				//To Check If The Content is Html page 
 				
 				if(toBeAddedUrl.contains("png")||toBeAddedUrl.contains("jpg")||toBeAddedUrl.contains("svg")||toBeAddedUrl.contains("jpeg")||toBeAddedUrl.contains("pdf")) {
@@ -371,32 +392,41 @@ class Crawler implements Runnable {
 				}
 				
 				//Start Adding to Database and Links 
+				boolean checkRobot = false ;
+				boolean reachedThousand = false;
+				
+				checkRobot = CheckRobots(page.attr("abs:href"));
 
 				synchronized (links) {
 					AddRefer(page.attr("abs:href"));
-					if (CheckRobots(page.attr("abs:href")) && !CheckExist(toBeAddedUrl)
+					if (checkRobot && !CheckExist(toBeAddedUrl)
 							&& links.size() < CrawlerController.NUMBER_OF_WEBSITES ) {
+
 						CrawlerObject toBeAdded = new CrawlerObject();
 						toBeAdded.setLinkURL(toBeAddedUrl);
 						links.add(toBeAdded);
+						System.out.println(links.size());
 						CrawlerController.NUM_OF_K_DOCUMENTS = CrawlerController.NUM_OF_K_DOCUMENTS + 1;
-
 						synchronized (CrawlerController.SYNCHRONIZATION) {
 							if(CrawlerController.NUM_OF_K_DOCUMENTS >= 1000) {
-								CrawlerController.SaveLinks();
-								CrawlerController.SaveRobots();
+								
 								CrawlerController.NUM_OF_K_DOCUMENTS = 0;
 								CrawlerController.SYNCHRONIZATION.incrementAndGet();
 								CrawlerController.SYNCHRONIZATION.notifyAll();
+								reachedThousand=true;
 							}
 						}
+
 					}
+				}
+				if(reachedThousand) {
+				CrawlerController.SaveLinks();
+				CrawlerController.SaveRobots();
 				}
 			}
 
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch (Exception e) {
+			System.out.println("error fetching " + URL);	
 		}
 		// }
 
@@ -446,8 +476,6 @@ class Crawler implements Runnable {
 				URLConnection urlcon = url.openConnection();
 				InputStream stream = urlcon.getInputStream();
 			
-					
-				
 				Scanner sc = new Scanner(stream);
 				boolean foundUser = false;
 
@@ -458,7 +486,7 @@ class Crawler implements Runnable {
 						foundUser = true;
 
 					} else if (foundUser) {
-						if (line.contains("User-agent")) {
+						if (line.contains("User-agent")|| line.contains("User-agent:")||line.contains("User-Agent:")||line.contains("User-Agent")) {
 							break;
 						}
 						String[] slashes = line.split(" ");

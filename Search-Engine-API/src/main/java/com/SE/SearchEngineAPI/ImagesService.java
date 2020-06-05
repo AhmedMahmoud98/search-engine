@@ -13,7 +13,6 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
-import Models.Document_;
 import Models.Image;
 import Models.TermImages;
 import Queries.QueryProcessor;

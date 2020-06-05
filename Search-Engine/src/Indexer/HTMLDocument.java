@@ -1,9 +1,7 @@
 package Indexer;
 import DB.DbManager;
 
-import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
-import org.jsoup.UnsupportedMimeTypeException;
 import org.jsoup.nodes.Document;
 
 import TextProcessing.Stemmer;
@@ -11,9 +9,6 @@ import TextProcessing.StopWords;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import java.io.IOException;
-import java.net.SocketTimeoutException;
-import java.net.URL;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -40,13 +35,13 @@ public class HTMLDocument {
 				parseImages(doc);
 				int termsSize = setTerms(docText , title);
 				
-				DbManager dbManager = new DbManager();
+				DbManager dbManager = DbManager.getInstance();
 				dbManager.UpdateCrawler(docID, docTextP, title, termsSize);
 				
-			} catch (UnsupportedMimeTypeException | HttpStatusException | SocketTimeoutException e) {
+			} catch (Exception e) {
 				System.out.println("error fetching " + url);				/* Not a valid Url */
 			}
-		} catch (IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace(); 
 		}
 	}
@@ -114,7 +109,8 @@ public class HTMLDocument {
 			}
 
 		}
-		DbManager dbManager = new DbManager();
+
+		DbManager dbManager = DbManager.getInstance();
 		dbManager.saveImageCollection(imageTerms , url);
 	}
 

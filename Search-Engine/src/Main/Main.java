@@ -1,7 +1,5 @@
 package Main;
 import java.io.IOException;
-import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
 
@@ -15,17 +13,26 @@ import java.util.logging.Level;
 public class Main {
 
     public static void main(String[] args) throws IOException, InterruptedException{
+    	String toBeAddedUrl = "www.facebook.com/Aly/Ramzy/content#reg";
 
-        /* Remove Mongo Logging */
+    	if(toBeAddedUrl.contains("#")) {
+			int index = toBeAddedUrl.lastIndexOf("/");
+			toBeAddedUrl = toBeAddedUrl.substring(0,index);
+			System.out.println(toBeAddedUrl);
+    	}
+    		
+        /* Remove Mongo Logging 
         Logger mongoLogger = Logger.getLogger("org.mongodb.driver");
         mongoLogger.setLevel(Level.SEVERE); // e.g. or Log.WARNING, etc.
         
         DbManager DBManager = DbManager.getInstance();
         DBManager.dropTables();
 		DBManager.addTablesIndices();
+		
         AtomicInteger synchronization = new AtomicInteger();
 
-        CrawlerController _crawler = new CrawlerController(5, 2000, synchronization);
+        CrawlerController _crawler = new CrawlerController(5, 5000, synchronization);
+
         Thread crawler = new Thread(_crawler);
         crawler.start();
         Indexer _indexer = new Indexer(synchronization);
@@ -34,6 +41,6 @@ public class Main {
 
         crawler.join();
         PageRank _Ranker = new PageRank(3, 0.7);
-        PageRank.main(new String[]{""});
+        PageRank.main(new String[]{""});*/
     }
 }

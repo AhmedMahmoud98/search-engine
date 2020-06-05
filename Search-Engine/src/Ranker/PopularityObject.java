@@ -5,7 +5,6 @@ import java.util.HashSet;
 public class PopularityObject {
     private HashSet<String> pointingLinks;
     private int numberOfURLs;
-    private boolean visited;
 
     public PopularityObject(HashSet<String> pointingLinks, int numberOfURLs) {
         super();
