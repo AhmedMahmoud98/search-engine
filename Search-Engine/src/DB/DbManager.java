@@ -67,7 +67,14 @@ public class DbManager {
         popularityCollection.drop();
         crawlerCollection.drop();
         seedsCollection.drop();
+        popularityCollection.createIndex(Indexes.ascending("link"));
+        popularityCollection.createIndex(Indexes.descending("popularity"));
    
+    }
+    public void recreateRancker() {
+    	MongoDatabase SearchEngine = mongoClient.getDatabase("SearchEngine");
+    	MongoCollection<Document> popularityCollection = SearchEngine.getCollection("PopularityTable");
+    	popularityCollection.drop();
     }
 
 ///////////////////////////////////    Crawler	 //////////////////////////////////
@@ -121,6 +128,12 @@ public class DbManager {
         return collection.find();
 
 
+    }
+    public int getCrawlerTableSize() {
+    	CommandResult resultSet = database.getCollection("CrawlerTable").getStats();
+    	
+    	return (int) resultSet.get("count");
+    
     }
     public DBCursor getCrawledLinks(){
     	DBCollection collection = database.getCollection("CrawlerTable");
@@ -178,6 +191,12 @@ public class DbManager {
         	        	collection.insert(entries);
     	        } catch(Exception e) {}
 
+    }
+    public int getIndexerTableSize() {
+    	CommandResult resultSet = database.getCollection("Document").getStats();
+    	
+    	return (int) resultSet.get("count");
+    
     }
     
     public void saveImageCollection(Map<String,List<String>> terms, String url){

@@ -38,12 +38,14 @@ public class CrawlerController implements Runnable {
 	public static int NUMBER_OF_THREADS;
 	/* synchronization with Indexer */
 	public static AtomicInteger SYNCHRONIZATION;   
+	public static AtomicInteger STOP;
 	public static int NUM_OF_K_DOCUMENTS = 0;
 	
-	public CrawlerController(int _numOfThreads, int numOfUrls, AtomicInteger synchronization){
+	public CrawlerController(int _numOfThreads, int numOfUrls, AtomicInteger synchronization,AtomicInteger stop){
 		this.NUMBER_OF_WEBSITES = numOfUrls;
 		this.NUMBER_OF_THREADS = _numOfThreads;
 		this.SYNCHRONIZATION = synchronization;
+		this.STOP = stop;
 	}
 
 	public void Crawl() throws InterruptedException {
@@ -54,17 +56,18 @@ public class CrawlerController implements Runnable {
 		INITIAL_SEEDS = new ArrayList<String>();
 		//////////////////////////////////////Initial Seeds for Crawling///////////////////////////////////////////////////////////////////
 		//INITIAL_SEEDS.add("https://www.geeksforgeeks.org/greedy-algorithms");
-		INITIAL_SEEDS.add("https://www.nytimes.com/");
-		INITIAL_SEEDS.add("https://www.techiedelight.com/");
-
+	//	INITIAL_SEEDS.add("https://www.nytimes.com/");
+		//INITIAL_SEEDS.add("https://www.techiedelight.com/");
+	
 		//INITIAL_SEEDS.add("https://www.kingfut.com/");
 		//INITIAL_SEEDS.add("https://www.skysports.com/football/news");
 		//INITIAL_SEEDS.add("https://en.wikipedia.org/wiki/Computer_science");
-		INITIAL_SEEDS.add("https://www.geeksforgeeks.org/greedy-algorithms");
-		INITIAL_SEEDS.add("https://www.fandango.com/famous-actors-and-actresses");
+		//INITIAL_SEEDS.add("https://www.geeksforgeeks.org/greedy-algorithms");
+		//INITIAL_SEEDS.add("https://www.fandango.com/famous-actors-and-actresses");
 		//INITIAL_SEEDS.add("https://www.mirror.co.uk/sport/football/news/");
-		INITIAL_SEEDS.add("https://www.techiedelight.com/");
+		//INITIAL_SEEDS.add("https://www.techiedelight.com/");
 		INITIAL_SEEDS.add("https://www.kingfut.com/");
+		//	INITIAL_SEEDS.add("https://www.biography.com");
 
 		//INITIAL_SEEDS.add("https://www.geeksforgeeks.org/computer-network-tutorials");
 		//INITIAL_SEEDS.add("https://www.premierleague.com/news");
@@ -202,6 +205,21 @@ public class CrawlerController implements Runnable {
 				System.out.println("Doesnt Need To Recrawl");
 				
 			}
+			if(recrawl) {
+				synchronized (CrawlerController.SYNCHRONIZATION) {
+					CrawlerController.SaveLinks();
+					CrawlerController.SaveRobots();
+					CrawlerController.NUM_OF_K_DOCUMENTS = 0;
+					CrawlerController.SYNCHRONIZATION.incrementAndGet();
+					
+					CrawlerController.SYNCHRONIZATION.notifyAll();
+				}
+			}
+			synchronized (CrawlerController.STOP) {
+				STOP.set(-1);
+				
+			}
+			
 			
 		
 	}
@@ -258,13 +276,13 @@ public class CrawlerController implements Runnable {
 
 		while (objects.hasNext()) {
 			Map crawledFromDB = objects.next().toMap();
-			String linkName = (String) crawledFromDB.get("Link");
-			ArrayList<String> sourceLinksArray = (ArrayList<String>) crawledFromDB.get("Source");
+			String linkName = (String) crawledFromDB.get("linkURL");
+			ArrayList<String> sourceLinksArray = (ArrayList<String>) crawledFromDB.get("pointingLinks");
 			HashSet<String> sourceLinks = new HashSet<String>(sourceLinksArray);
 
-			int numberOfLinks = (int) crawledFromDB.get("Number Of Links");
-			int index = (int) crawledFromDB.get("CrawledIndex");
-			boolean Visited = (boolean) crawledFromDB.get("Visited");
+			int numberOfLinks = (int) crawledFromDB.get("numberOfURLs");
+			int index = (int) crawledFromDB.get("crawledIndex");
+			boolean Visited = (boolean) crawledFromDB.get("visited");
 			CrawlerObject c = new CrawlerObject(linkName, sourceLinks, numberOfLinks, Visited);
 			LINKS.add(c);
 		}
@@ -405,23 +423,27 @@ class Crawler implements Runnable {
 						CrawlerObject toBeAdded = new CrawlerObject();
 						toBeAdded.setLinkURL(toBeAddedUrl);
 						links.add(toBeAdded);
-						System.out.println(links.size());
+					//	System.out.println(links.size());
 						CrawlerController.NUM_OF_K_DOCUMENTS = CrawlerController.NUM_OF_K_DOCUMENTS + 1;
-						synchronized (CrawlerController.SYNCHRONIZATION) {
+						
 							if(CrawlerController.NUM_OF_K_DOCUMENTS >= 1000) {
 								
-								CrawlerController.NUM_OF_K_DOCUMENTS = 0;
-								CrawlerController.SYNCHRONIZATION.incrementAndGet();
-								CrawlerController.SYNCHRONIZATION.notifyAll();
+								
 								reachedThousand=true;
-							}
+							
 						}
 
 					}
 				}
 				if(reachedThousand) {
+					synchronized (CrawlerController.SYNCHRONIZATION) {
+					CrawlerController.NUM_OF_K_DOCUMENTS = 0;
+					CrawlerController.SYNCHRONIZATION.incrementAndGet();
+					
 				CrawlerController.SaveLinks();
 				CrawlerController.SaveRobots();
+				CrawlerController.SYNCHRONIZATION.notifyAll();
+					}
 				}
 			}
 

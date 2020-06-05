@@ -39,19 +39,19 @@ public class ApiController {
 		    trendsService.extractTrends(_query);
 		    timeAfter = System.currentTimeMillis();
 		    Time = timeAfter - timeBefore;
-		    System.out.println("Trends Time: " + Time + " ms");
+		    //System.out.println("Trends Time: " + Time + " ms");
 		    
 		    timeBefore = System.currentTimeMillis();
 		    suggestionsService.saveSuggestion(query);
 		    timeAfter = System.currentTimeMillis();
 		    Time = timeAfter - timeBefore;
-		    System.out.println("Suggestions Time: " + Time + " ms");
+		    //System.out.println("Suggestions Time: " + Time + " ms");
 
 		    timeBefore = System.currentTimeMillis();
 			ArrayList<String> sortedLinks = rankingService.rank(_query);
 			timeAfter = System.currentTimeMillis();
 		    Time = timeAfter - timeBefore;
-		    System.out.println("Ranking Time: " + Time + " ms");
+		   // System.out.println("Ranking Time: " + Time + " ms");
 		    
 		    if (sortedLinks.isEmpty()) {
 			      return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -66,7 +66,7 @@ public class ApiController {
 		    Pages pages = new Pages(pagesList, sortedLinks.size());
 		  	timeAfter = System.currentTimeMillis();
 		    Time = timeAfter - timeBefore;
-		    System.out.println("Paging Time: " + Time + " ms");
+		   // System.out.println("Paging Time: " + Time + " ms");
 
 		    return new ResponseEntity<>(pages, HttpStatus.OK);
 		  } catch (Exception e) {

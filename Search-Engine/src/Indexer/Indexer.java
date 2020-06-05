@@ -12,15 +12,18 @@ public class Indexer implements Runnable {
     private List<String> documentsURLs;
 	/* synchronization with Crawler, It indicates number of k documents that don't indexed yet */
 	public AtomicInteger SYNCHRONIZATION;  
+	public AtomicInteger STOP;  
 
-    public Indexer(AtomicInteger synchronization) {
+    public Indexer(AtomicInteger synchronization,AtomicInteger stop) {
         documentsURLs = new ArrayList<String>();
         this.SYNCHRONIZATION = synchronization;
+        this.STOP = stop;
     }
 
     public void getDocumentsURLs(int startingIndex) throws IOException {
     	DbManager DBManager = DbManager.getInstance();
     	documentsURLs =  DBManager.getCrawledUrls(startingIndex);
+    	System.out.println(documentsURLs.size());
     }
     
 	@Override
@@ -38,10 +41,16 @@ public class Indexer implements Runnable {
     	{
     		synchronized (this.SYNCHRONIZATION) {
     			if(this.SYNCHRONIZATION.get() == 0) {
+    				if(STOP.get()==-1) {
+    					return;
+    				}
     				this.SYNCHRONIZATION.wait();
     			}
+    			
     		}
 	        getDocumentsURLs(Count);
+	       
+	        
 	        final int DOCUMENTS_PER_THREAD = (int) Math.ceil(documentsURLs.size() / (float)NUMBER_OF_THREAD);
 	        long timeBefore = 0, timeAfter= 0, IndexingTime = 0;
 	        timeBefore = System.currentTimeMillis();

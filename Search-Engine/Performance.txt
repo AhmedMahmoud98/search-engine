@@ -1,0 +1,58 @@
+Testing Request Latency With Different Sizes For Crawler And Indexer Tables...
+Without Ranking Process
+Size of The Crawler Table is : 500  ,And Size of The Indexer Table is : 193215  ,And The Time For Response is : 52.0 ms
+With Ranking Process
+Size of The Crawler Table is : 500  ,And Size of The Indexer Table is : 193215  ,And The Time For Response is : 70.0 ms
+Without Ranking Process
+Size of The Crawler Table is : 1000  ,And Size of The Indexer Table is : 403945  ,And The Time For Response is : 196.0 ms
+With Ranking Process
+Size of The Crawler Table is : 1000  ,And Size of The Indexer Table is : 403945  ,And The Time For Response is : 271.0 ms
+Without Ranking Process
+Size of The Crawler Table is : 1500  ,And Size of The Indexer Table is : 560712  ,And The Time For Response is : 342.0 ms
+With Ranking Process
+Size of The Crawler Table is : 1500  ,And Size of The Indexer Table is : 560712  ,And The Time For Response is : 486.0 ms
+Without Ranking Process
+Size of The Crawler Table is : 2000  ,And Size of The Indexer Table is : 743582  ,And The Time For Response is : 505.0 ms
+With Ranking Process
+Size of The Crawler Table is : 2000  ,And Size of The Indexer Table is : 743582  ,And The Time For Response is : 729.0 ms
+
+Testing Latency While Increasing Number Of Requests...
+0  Request Sent Recived Response in Time =  : 326.0 ms
+10  Request Sent Recived Response in Time =  : 450.0 ms
+20  Request Sent Recived Response in Time =  : 1066.0 ms
+30  Request Sent Recived Response in Time =  : 1620.0 ms
+40  Request Sent Recived Response in Time =  : 2352.0 ms
+50  Request Sent Recived Response in Time =  : 3028.0 ms
+60  Request Sent Recived Response in Time =  : 3742.0 ms
+70  Request Sent Recived Response in Time =  : 4482.0 ms
+80  Request Sent Recived Response in Time =  : 5044.0 ms
+90  Request Sent Recived Response in Time =  : 5702.0 ms
+100  Request Sent Recived Response in Time =  : 6619.0 ms
+110  Request Sent Recived Response in Time =  : 7254.0 ms
+120  Request Sent Recived Response in Time =  : 7825.0 ms
+130  Request Sent Recived Response in Time =  : 8593.0 ms
+140  Request Sent Recived Response in Time =  : 9028.0 ms
+150  Request Sent Recived Response in Time =  : 10017.0 ms
+160  Request Sent Recived Response in Time =  : 10430.0 ms
+170  Request Sent Recived Response in Time =  : 11336.0 ms
+180  Request Sent Recived Response in Time =  : 12185.0 ms
+190  Request Sent Recived Response in Time =  : 12732.0 ms
+
+Testing Number Of Requests...
+Number OF Sent Request : 0  , Got Responses For : 0
+Number OF Sent Request : 10  , Got Responses For : 10
+Number OF Sent Request : 20  , Got Responses For : 20
+Number OF Sent Request : 30  , Got Responses For : 30
+Number OF Sent Request : 40  , Got Responses For : 40
+Number OF Sent Request : 50  , Got Responses For : 50
+Number OF Sent Request : 60  , Got Responses For : 60
+Number OF Sent Request : 70  , Got Responses For : 70
+Number OF Sent Request : 80  , Got Responses For : 80
+Number OF Sent Request : 90  , Got Responses For : 90
+Number OF Sent Request : 100  , Got Responses For : 45
+Number OF Sent Request : 110  , Got Responses For : 10
+Number OF Sent Request : 120  , Got Responses For : 0
+Number OF Sent Request : 130  , Got Responses For : 0
+Number OF Sent Request : 140  , Got Responses For : 0
+Number OF Sent Request : 150  , Got Responses For : 0
+
