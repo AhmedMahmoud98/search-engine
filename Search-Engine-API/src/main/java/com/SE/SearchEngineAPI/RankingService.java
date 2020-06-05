@@ -31,7 +31,6 @@ public class RankingService {
         double tfidf;
                 
         Set<String> urls = new HashSet<>();
-        Set<String> phraseUrls = new HashSet<>();
         ArrayList<Double> queryTFIDF = new ArrayList<>();
         tfidf = 1.0 / processed.size();
         for (int k=0; k < processed.size(); k++){
@@ -46,6 +45,7 @@ public class RankingService {
         String doc;
         Map<String, Double> phraseTemp;
         PhraseService phServ = new PhraseService(this.mongoOperations);
+        VisitedUrlsService visServ = new VisitedUrlsService(this.mongoOperations);
         boolean phraseExists = false;
         for (int i = 0; i < processed.size(); i++){
             zeros.add(0.0);
@@ -60,7 +60,6 @@ public class RankingService {
                 phraseExists = phraseExists || (phraseTemp.keySet().size() > 0);
                 for (String url : phraseTemp.keySet()){
                     urls.add(url);
-                    phraseUrls.add(url);
                     if (rankings.get(url) == null) {
                         temp = new ArrayList<>(zeros);
                         rankings.put(url, temp);
@@ -103,9 +102,7 @@ public class RankingService {
         // System.out.println(avgSum);
 
         // Popularity score
-
         List<Popularity> popularityScore = getPopularity(new ArrayList<>(urls));
-
         String link;
         avgSum = 0;
         int popScoreCoeff = 4;
@@ -118,6 +115,13 @@ public class RankingService {
         // avgSum /= urls.size();
         // System.out.println(avgSum);
 
+        // Personalized score
+        List<VisitedUrl> visitedUrls = visServ.getVisitedUrls(processed);
+        double persCoeff = 0.001;
+        for(VisitedUrl vis:visitedUrls){
+            value = finalRanked.get(vis.getVisitedUrl()) + persCoeff * vis.getFrequency();
+            finalRanked.replace(vis.getVisitedUrl(), value);
+        }
         finalRanked = sortByValue(finalRanked);
         return new ArrayList<>(finalRanked.keySet());
     }

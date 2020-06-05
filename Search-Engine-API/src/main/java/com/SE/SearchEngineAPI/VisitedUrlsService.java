@@ -2,9 +2,12 @@ package com.SE.SearchEngineAPI;
 
 import static org.springframework.data.mongodb.core.FindAndModifyOptions.options;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import Models.Popularity;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -36,5 +39,21 @@ public class VisitedUrlsService {
     	 		mongoOperations.findAndModify(query, incFreqUpdate, options().returnNew(true).upsert(true), VisitedUrl.class);
     	 		query = new Query();
     	 	}
-    } 
+    }
+    public List<VisitedUrl> getVisitedUrls(ArrayList<String> queryWords){
+		Query query = new Query();
+		Criteria orCrit = new Criteria();
+		List<Criteria> orExpr = new ArrayList<>();
+		for (String q : queryWords) {
+			Criteria temp = new Criteria();
+			temp.and("queryTerm").is(q);
+			orExpr.add(temp);
+		}
+
+		if(orExpr.isEmpty())    return new ArrayList<>();
+
+		query.addCriteria(orCrit.orOperator(orExpr.toArray(new Criteria[orExpr.size()])));
+
+		return this.mongoOperations.find(query, VisitedUrl.class);
+	}
 } 
