@@ -1,10 +1,8 @@
 package Models;
 
-import org.springframework.data.mongodb.core.index.CompoundIndex;
-
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@CompoundIndex(name = "keyindex", def = "{'queryTerm' : 1, 'visitedUrl' : 1}")
+
 @Document(collection = "VisitedURLs")
 public class VisitedUrl {
   private String queryTerm;

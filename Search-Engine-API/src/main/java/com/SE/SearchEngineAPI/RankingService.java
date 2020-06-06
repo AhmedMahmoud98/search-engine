@@ -97,6 +97,7 @@ public class RankingService {
             avgSum += value;
             finalRanked.put(s, value);
         }
+
         // Used to check for a good coefficient for the popularity part in the Scoring function.
         // avgSum /= urls.size();
         // System.out.println(avgSum);
@@ -112,16 +113,18 @@ public class RankingService {
             avgSum += value;
             finalRanked.replace(link, (popScoreCoeff * value) + finalRanked.get(link));
         }
+
         // avgSum /= urls.size();
         // System.out.println(avgSum);
 
         // Personalized score
         List<VisitedUrl> visitedUrls = visServ.getVisitedUrls(processed);
         double persCoeff = 0.001;
-        for(VisitedUrl vis:visitedUrls){
+        for(VisitedUrl vis:visitedUrls) {
             value = finalRanked.get(vis.getVisitedUrl()) + persCoeff * vis.getFrequency();
             finalRanked.replace(vis.getVisitedUrl(), value);
         }
+        
         finalRanked = sortByValue(finalRanked);
         return new ArrayList<>(finalRanked.keySet());
     }

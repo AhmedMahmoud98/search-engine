@@ -32,41 +32,28 @@ public class ApiController {
 		  								 @RequestParam String country,
 		  								 @RequestParam String pageNumber) {
 	  try {
-		    long timeBefore = 0, timeAfter= 0, Time = 0;
 		  	CustomQuery _query = new CustomQuery(query, country, Integer.parseInt(pageNumber));
-		  	
-		  	timeBefore = System.currentTimeMillis();
+		  	/* Extract Query Trends */
 		    trendsService.extractTrends(_query);
-		    timeAfter = System.currentTimeMillis();
-		    Time = timeAfter - timeBefore;
-		    //System.out.println("Trends Time: " + Time + " ms");
-		    
-		    timeBefore = System.currentTimeMillis();
+		    /* Save Query at Suggestion Table */
 		    suggestionsService.saveSuggestion(query);
-		    timeAfter = System.currentTimeMillis();
-		    Time = timeAfter - timeBefore;
-		    //System.out.println("Suggestions Time: " + Time + " ms");
-
-		    timeBefore = System.currentTimeMillis();
+		    /* Start Ranking Process */
 			ArrayList<String> sortedLinks = rankingService.rank(_query);
-			timeAfter = System.currentTimeMillis();
-		    Time = timeAfter - timeBefore;
-		   // System.out.println("Ranking Time: " + Time + " ms");
-		    
+
 		    if (sortedLinks.isEmpty()) {
 			      return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 			 }
-	
-			timeBefore = System.currentTimeMillis();
+		    /* Send the Required Pages based on the Page Number Required */
 			int sizeOfPage = 10;
 			int fromIdx = (Integer.parseInt(pageNumber) - 1) * sizeOfPage;
 		    int toIdx = Math.min(fromIdx + sizeOfPage, sortedLinks.size());
 		    List<Page> pagesList = new ArrayList<Page>();
+		    
+		    /* Extract The Pages Summary and Title */
 		    pagesList = pageGenerationService.generatPages(sortedLinks.subList(fromIdx, toIdx), query);
+		    
+		    /* Wrap the Page List and the Pages size into the model that will be sent */
 		    Pages pages = new Pages(pagesList, sortedLinks.size());
-		  	timeAfter = System.currentTimeMillis();
-		    Time = timeAfter - timeBefore;
-		   // System.out.println("Paging Time: " + Time + " ms");
 
 		    return new ResponseEntity<>(pages, HttpStatus.OK);
 		  } catch (Exception e) {
@@ -80,20 +67,11 @@ public class ApiController {
 			  							  @RequestParam String country,
 			  							  @RequestParam String pageNumber) {
 	  try {
-		  	long timeBefore = 0, timeAfter= 0, Time = 0;
 		  	CustomQuery _query = new CustomQuery(query, country, Integer.parseInt(pageNumber));
-		  	
-		  	timeBefore = System.currentTimeMillis();
+
 		    trendsService.extractTrends(_query);
-		    timeAfter = System.currentTimeMillis();
-		    Time = timeAfter - timeBefore;
-		    System.out.println("Trends Time: " + Time + " ms");
-		    
-		    timeBefore = System.currentTimeMillis();
 		    suggestionsService.saveSuggestion(query);
-		    timeAfter = System.currentTimeMillis();
-		    Time = timeAfter - timeBefore;
-		    System.out.println("Suggestions Time: " + Time + " ms");
+
 		    List<Image> imagesList = imagesService.getImages(query);
 		    if (imagesList.isEmpty()) {
 		      return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -106,7 +84,6 @@ public class ApiController {
 		    Images images = new Images(imagesList.subList(fromIdx, toIdx), imagesList.size());
 
 		    if (imagesList.isEmpty()) {
-		    	System.out.println("Hello");
 		      return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 		    }
 		    return new ResponseEntity<>(images, HttpStatus.OK);

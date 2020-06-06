@@ -5,9 +5,7 @@ import static org.springframework.data.mongodb.core.FindAndModifyOptions.options
 import java.util.ArrayList;
 import java.util.List;
 
-import Models.Popularity;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -33,13 +31,13 @@ public class VisitedUrlsService {
     	 	Query query = new Query();
     	 	for (String term : QueryStrings) 
     	 	{
-    	 		System.out.println(term);
     	 		query.addCriteria(new Criteria().and("queryTerm").is(term).and("visitedUrl").is(visitedUrl));
     	 		Update incFreqUpdate = new Update().inc("frequency", 1).set("queryTerm", term).set("visitedUrl", visitedUrl);
     	 		mongoOperations.findAndModify(query, incFreqUpdate, options().returnNew(true).upsert(true), VisitedUrl.class);
     	 		query = new Query();
     	 	}
     }
+    
     public List<VisitedUrl> getVisitedUrls(ArrayList<String> queryWords){
 		Query query = new Query();
 		Criteria orCrit = new Criteria();
